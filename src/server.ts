@@ -1,68 +1,64 @@
 import cors from 'cors';
 import express from 'express';
-import bodyParser from 'body-parser';
+import { createServer } from 'http';
 import morgan from 'morgan';
-import mongoose, { ConnectOptions } from 'mongoose';
-import env from 'env-var';
+import { Sequelize } from 'sequelize-typescript';
 import dotenv from 'dotenv';
-
 import { errorHandler } from 'errors';
 import { validationErrorHandler } from 'validation';
-import {
-  authRouter, userRouter, resourceRouter,
-} from './routers';
 
-import * as constants from './helpers/constants';
+import * as models from './db/models';
+import {
+  authRouter, 
+  userRouter, 
+  resourceRouter,
+} from './routers';
 
 dotenv.config();
 
-// initialize
-const app = express();
+const app = express(); // initialize
+app.use(cors()); // enable/disable cross origin resource sharing if necessary
+if (process.env.NODE_ENV !== 'test') app.use(morgan('dev')); // enable/disable http request logging
+app.use(express.json({ limit: '100mb' }));
 
-// enable/disable cross origin resource sharing if necessary
-app.use(cors());
+const server = createServer(app);
+const port = process.env.PORT;
+server.listen({ port }, () => {
+  console.log(`Server listening on port ${port}!`);
+});
 
-// enable/disable http request logging
-if (process.env.NODE_ENV !== 'test') app.use(morgan('dev'));
+export const sequelize = new Sequelize( // Connect the database
+  process.env.DATABASE_URL ?? '', 
+  {
+    dialect: 'postgres',
+    logging: false,
+    models: Object.values(models) as string[],
+    dialectOptions: {
+      ssl: process.env.NODE_ENV === 'production' && {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
+  },
+);
 
-// enable json message body for posting data to API
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+// sequelize.sync();
+
+try {
+  sequelize.authenticate();
+  console.log('Database connection has been established successfully.');
+} catch (error) {
+  console.error('Unable to connect to the database:', error);
+}
 
 // declare routers
 app.use('/auth', authRouter); // NOTE: Not secured
 app.use('/users', userRouter); // NOTE: Completely secured to users
 app.use('/resources', resourceRouter); // NOTE: Partially secured to users
-
-// default index route
-app.get('/', (req, res) => {
-  res.send('Welcome to backend!');
-});
-
-// DB Setup
-const mongooseOptions: ConnectOptions = {
-  loggerLevel: 'error',
-};
-
-// Connect the database
-mongoose.connect(env.get('MONGODB_URI').required().asString(), mongooseOptions)
-  .then(() => {
-    if (process.env.NODE_ENV !== 'test') console.info('Connected to Database');
-  }).catch((err) => {
-    // mongoose.connect(env.get('MONGODB_URI').required().asString(), mongooseOptions);
-    console.error('Not Connected to Database - ERROR! ', err);
-  });
-
-// Custom 404 middleware
-app.use((req, res) => {
+app.use((req, res) => { // Custom 404 middleware
   res.status(404).json({ message: 'The route you\'ve requested doesn\'t exist' });
 });
-
 app.use(validationErrorHandler);
 app.use(errorHandler);
 
-// START THE SERVER
-// =============================================================================
-const server = app.listen(constants.PORT);
-if (process.env.NODE_ENV !== 'test') console.log(`listening on: ${constants.PORT}`);
 export default server;

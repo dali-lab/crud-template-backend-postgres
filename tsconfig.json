@@ -23,7 +23,9 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "preserve",
     "outDir": "dist",
-    "sourceMap": true
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false
   },
   "exclude": [
     "node_modules",

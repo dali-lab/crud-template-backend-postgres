@@ -21,6 +21,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      role: {
+        type: Sequelize.ENUM('USER', 'ADMIN'),
+        defaultValue: 'USER',
+        allowNull: false,
+      },
       verified: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,

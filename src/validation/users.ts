@@ -1,25 +1,23 @@
 import joi from 'joi';
 import { ValidatedRequestSchema, ContainerTypes } from 'express-joi-validation';
-import { UserFields } from 'types/models';
+import { IUser } from '../db/models/user';
 
-export const CreateUserSchema = joi.object<UserFields>({
+export const CreateUserSchema = joi.object<IUser>({
   email: joi.string().email().required(),
   password: joi.string().required(),
-  first_name: joi.string().required(),
-  last_name: joi.string().required(),
+  name: joi.string().required(),
 });
 
 export interface CreateUserRequest extends ValidatedRequestSchema {
-  [ContainerTypes.Body]: UserFields
+  [ContainerTypes.Body]: IUser
 }
 
-export const UpdateUserSchema = joi.object<UserFields>({
+export const UpdateUserSchema = joi.object<IUser>({
   email: joi.string().email(),
   password: joi.string(),
-  first_name: joi.string(),
-  last_name: joi.string(),
+  name: joi.string(),
 });
 
 export interface UpdateUserRequest extends ValidatedRequestSchema {
-  [ContainerTypes.Body]: Partial<UserFields>
+  [ContainerTypes.Body]: Partial<IUser>
 }

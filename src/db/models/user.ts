@@ -11,11 +11,17 @@ import {
 } from 'sequelize-typescript';
 import bcrypt from 'bcrypt';
 
+export enum UserScopes {
+  User = 'USER',
+  Admin = 'ADMIN',
+}
+
 export interface IUser {
   id: string;
   email: string;
   password: string; // encrypted
   name: string;
+  role: UserScopes;
   verified: boolean; // True if user has verified their account via email
 }
 
@@ -40,6 +46,10 @@ class User extends Model<IUser> implements IUser {
   @AllowNull(false)
   @Column(DataTypes.STRING)
     name: string;
+
+  @AllowNull(false)
+  @Column(DataTypes.ENUM({ values: ['USER', 'ADMIN'] }))
+    role: UserScopes;
 
   @Default(false)
   @AllowNull(false)

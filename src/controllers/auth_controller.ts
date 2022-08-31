@@ -4,37 +4,30 @@ import env from 'env-var';
 import { RequestHandler } from 'express';
 import { ValidatedRequest } from 'express-joi-validation';
 
-import { BaseError } from 'errors';
-import { userService } from 'services';
-import { UserDoc } from 'types/models';
+import { createUser } from 'services/user-service';
+import { IUser } from 'db/models/user';
 import { RequestWithJWT } from 'types/requests';
 import { SignUpUserRequest } from 'validation/auth';
 
 dotenv.config();
 
-const tokenForUser = (user: UserDoc): string => {
+const tokenForUser = (user: IUser): string => {
   const timestamp = new Date().getTime();
   const exp = Math.round((timestamp + 2.628e+9) / 1000);
-  return jwt.encode({ sub: user._id, iat: timestamp, exp }, env.get('AUTH_SECRET').required().asString());
+  return jwt.encode({ sub: user.id, iat: timestamp, exp }, env.get('AUTH_SECRET').required().asString());
 };
 
 const signUpUser: RequestHandler = async (req: ValidatedRequest<SignUpUserRequest>, res, next) => {
   try {
     const {
-      email, password, first_name: firstName, last_name: lastName,
+      email, password, name,
     } = req.body;
 
-    // Check if a user already has this email address
-    const emailAvailable = await userService.isEmailAvailable(email);
-    if (!emailAvailable) throw new BaseError('Email address already associated to a user', 409);
-
     // Make a new user from passed data
-    const savedUser = await userService.createUser({
+    const savedUser = await createUser({
       email,
       password,
-      first_name: firstName ?? '',
-      last_name: lastName ?? '',
-      scope: 'USER',
+      name,
     });
 
     // Save the user then transmit to frontend

@@ -4,7 +4,7 @@ import { createValidator } from 'express-joi-validation';
 
 import requireScope from 'auth/requireScope';
 import requireSelf from 'auth/requireSelf';
-import { userController } from 'controllers';
+import { createNewUser, getUser, updateUser, deleteUser } from 'controllers';
 import { errorHandler } from 'errors';
 import { validationErrorHandler } from 'validation';
 import { CreateUserSchema, UpdateUserSchema } from 'validation/users';
@@ -20,32 +20,28 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 router.route('/')
-  .get(
-    requireScope('ADMIN'),
-    userController.getAllUsers,
-  )
   .post(
     requireScope('ADMIN'),
     validator.body(CreateUserSchema),
-    userController.createNewUser,
+    createNewUser,
   );
 
 router.route('/:id')
   .get(
     requireScope('USER'),
     requireSelf('ADMIN'),
-    userController.getUser,
+    getUser,
   )
   .patch(
     requireScope('USER'),
     requireSelf('ADMIN'),
     validator.body(UpdateUserSchema),
-    userController.updateUser,
+    updateUser,
   )
   .delete(
     requireScope('USER'),
     requireSelf('ADMIN'),
-    userController.deleteUser,
+    deleteUser,
   );
 
 if (process.env.NODE_ENV === 'test') {

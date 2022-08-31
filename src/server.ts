@@ -21,18 +21,18 @@ app.use(cors()); // enable/disable cross origin resource sharing if necessary
 if (process.env.NODE_ENV !== 'test') app.use(morgan('dev')); // enable/disable http request logging
 app.use(express.json({ limit: '100mb' }));
 
-const server = createServer(app);
+export const server = createServer(app);
 const port = process.env.PORT;
 server.listen({ port }, () => {
   console.log(`Server listening on port ${port}!`);
 });
 
-export const sequelize = new Sequelize( // Connect the database
+export const db = new Sequelize( // Connect the database
   process.env.DATABASE_URL ?? '', 
   {
     dialect: 'postgres',
     logging: false,
-    models: Object.values(models) as string[],
+    models: Object.values(models),
     dialectOptions: {
       ssl: process.env.NODE_ENV === 'production' && {
         require: true,
@@ -45,7 +45,7 @@ export const sequelize = new Sequelize( // Connect the database
 // sequelize.sync();
 
 try {
-  sequelize.authenticate();
+  db.authenticate();
   console.log('Database connection has been established successfully.');
 } catch (error) {
   console.error('Unable to connect to the database:', error);

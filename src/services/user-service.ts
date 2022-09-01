@@ -9,6 +9,7 @@ import { BaseError } from 'errors';
 export interface UserParams {
   id?: string;
   email?: string;
+  password?: string;
   name?: string;
   verified?: string;
   role?: string;
@@ -18,7 +19,7 @@ export interface UserParams {
 }
 
 const constructQuery = (params: UserParams) => {
-  const { id, email, name, verified, role, limit = 30, offset = 0 } = params;
+  const { id, email, password, name, verified, role, limit = 30, offset = 0 } = params;
   const query: DatabaseQuery<UserParams> & {
     attributes: { exclude: string[] };
   } = {
@@ -33,6 +34,11 @@ const constructQuery = (params: UserParams) => {
   if (email) {
     query.where.email = {
       [Op.eq]: email,
+    };
+  }
+  if (password) {
+    query.where.password = {
+      [Op.eq]: password,
     };
   }
   if (name) {
@@ -59,21 +65,26 @@ const constructQuery = (params: UserParams) => {
   return query;
 };
 
-export const getUsers = async (params: UserParams) => {
+const getUsers = async (params: Omit<UserParams, 'password'>) => {
   const query = constructQuery(params);
   try {
     return await UserModel.findAll(query);
   } catch (e : any) {
+
     throw new BaseError(e.message, 500);
   }
 };
 
-export const editUsers = async (user: Partial<IUser>, params: UserParams) => {
+const editUsers = async (user: Partial<IUser>, params: UserParams) => {
+  if (params.password) {
+    params.password = await bcrypt.hash(params.password, 10);
+  }
   const query = constructQuery(params);
+  console.log(query);
   return (await UserModel.update(user, { ...query, returning: true }))[1];
 };
 
-export const deleteUsers = async (params: UserParams) => {
+const deleteUsers = async (params: UserParams) => {
   const query = constructQuery(params);
   try {
     return await UserModel.destroy(query);
@@ -82,7 +93,7 @@ export const deleteUsers = async (params: UserParams) => {
   }
 };
 
-export const isValidPassword = async (email: string, password: string) => {
+const isValidPassword = async (email: string, password: string) => {
   const users = await getUsers({ email });
   // get password; getUsers omits it
   const hash = (
@@ -100,7 +111,7 @@ export const isValidPassword = async (email: string, password: string) => {
   }
 };
 
-export const createUser = async (user: Pick<IUser, 'email' | 'password' | 'name'>) => {
+const createUser = async (user: Pick<IUser, 'email' | 'password' | 'name'>) => {
   // check for inactive account with this email
   // db-level unique constraint on email; can assume only one user if any
   const usersSameEmail = await getUsers({
@@ -123,3 +134,13 @@ export const createUser = async (user: Pick<IUser, 'email' | 'password' | 'name'
     throw new BaseError('Email address already associated to a user', 409);
   }
 };
+
+const userService = {
+  createUser,
+  getUsers,
+  editUsers,
+  deleteUsers,
+  isValidPassword,
+};
+
+export default userService;

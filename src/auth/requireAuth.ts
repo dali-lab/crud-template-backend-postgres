@@ -1,33 +1,33 @@
 /* eslint-disable func-names */
 import passport from 'passport';
-import { Strategy as JwtStrategy, ExtractJwt, StrategyOptions } from 'passport-jwt';
+import { Strategy as jwtStrategy, ExtractJwt } from 'passport-jwt';
 import dotenv from 'dotenv';
-
 import { RequestHandler } from 'express';
-import { Users } from 'models';
+import { userService } from 'services';
+import { IUser } from 'db/models/user';
 
 dotenv.config();
 
-const jwtOptions: StrategyOptions = {
-  secretOrKey: process.env.AUTH_SECRET,
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-};
+passport.use(
+  'jwt',
+  new jwtStrategy(
+    {
+      secretOrKey: (process.env.AUTH_SECRET ?? '').toString(),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    },
+    async (token, done) => {
+      try {
+        // use id encrypted in token to get user
+        const userResult: IUser[] = await userService.getUsers({ id: token.user.id });
+        if (userResult.length == 0) return done(new Error('Invalid token.'));
 
-const jwtLogin = new JwtStrategy(jwtOptions, (payload, done) => {
-  // See if the token matches any user document in the DB
-  // Done function in the form -> "done(resulting error, resulting user)"
-  Users.findById(payload.sub, (err, user) => {
-    // This logic can be modified to check for user attributes
-    if (err) {
-      return done(err, false); // Error return
-    } if (user) {
-      return done(null, user); // Valid user return
-    }
-    return done(null, false); // Catch no valid user return
-  });
-});
-
-passport.use(jwtLogin);
+        return done(null, userResult[0]);
+      } catch (e) {
+        done(e);
+      }
+    },
+  ),
+);
 
 // Create function to transmit result of authenticate() call to user or next middleware
 const requireAuth: RequestHandler = (req, res, next) => {

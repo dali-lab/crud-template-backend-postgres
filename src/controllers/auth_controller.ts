@@ -4,7 +4,7 @@ import env from 'env-var';
 import { RequestHandler } from 'express';
 import { ValidatedRequest } from 'express-joi-validation';
 
-import { createUser } from 'services/user-service';
+import { userService } from 'services';
 import { IUser } from 'db/models/user';
 import { RequestWithJWT } from 'types/requests';
 import { SignUpUserRequest } from 'validation/auth';
@@ -24,7 +24,7 @@ const signUpUser: RequestHandler = async (req: ValidatedRequest<SignUpUserReques
     } = req.body;
 
     // Make a new user from passed data
-    const savedUser = await createUser({
+    const savedUser = await userService.createUser({
       email,
       password,
       name,

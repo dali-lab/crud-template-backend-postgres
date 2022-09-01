@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import { isSubScope, ScopeNames } from 'auth/scopes';
-import { User } from 'types/models';
+import { IUser } from 'db/models/user';
 
 /**
  * Middleware enforcing that a user can only edit their own model (user id matches params.id)
@@ -8,12 +8,12 @@ import { User } from 'types/models';
  * @returns express request handler
  */
 const requireSelf = (adminScope: ScopeNames): RequestHandler => (req, res, next) => {
-  const user = req.user as User;
+  const user = req.user as IUser;
 
   if (!user) { return res.status(400).json({ message: 'No user object attached' }); }
   if (!req.params.id) { return res.status(400).json({ message: 'Invalid URL id' }); }
 
-  if (req.user !== req.params.id && !isSubScope(user.scope, adminScope)) { return res.status(403).json({ message: 'Unauthorized' }); }
+  if (req.user !== req.params.id && !isSubScope(user.role, adminScope)) { return res.status(403).json({ message: 'Unauthorized' }); }
 
   return next();
 };

@@ -1,26 +1,24 @@
 import supertest from 'supertest';
-import { connectDB, dropDB } from '../../../__jest__/helpers';
-
+// import { connectDB, dropDB } from '../../../__jest__/helpers';
 import userRouter from 'routers/user_router';
 import { userService } from 'services';
+import { db } from '../../server';
 
 const request = supertest(userRouter);
 
 let validId = '';
-const invalidId = 'invalidId';
+const invalidId = '365e5281-bbb5-467c-a92d-2f4041828948';
 
 const userDataA = {
   email: 'garrygergich@test.com',
   password: 'muncie',
-  first_name: 'Garry',
-  last_name: 'Gergich',
+  name: 'Garry Gergich',
 };
 
 const userDataB = {
   email: 'benwyatt@test.com',
   password: 'icetown',
-  first_name: 'Ben',
-  last_name: 'Wyatt',
+  name: 'Ben Wyatt',
 };
 
 // Mocks requireAuth server middleware
@@ -30,11 +28,12 @@ jest.mock('../../auth/requireSelf');
 
 describe('Working user router', () => {
   beforeAll(async () => {
-    connectDB();
-  });
-
-  afterAll(async () => {
-    dropDB();
+    try {
+      await db.authenticate();
+      await db.sync();
+    } catch (error) {
+      throw new Error('Unable to connect to database...');
+    }
   });
 
   describe('POST /', () => {
@@ -106,7 +105,7 @@ describe('Working user router', () => {
       expect(createSpy).toHaveBeenCalled();
       createSpy.mockClear();
 
-      validId = String(res.body._id);
+      validId = String(res.body.id);
     });
 
     it('blocks user creation if email already in use', async () => {
@@ -118,40 +117,13 @@ describe('Working user router', () => {
         .send(userDataA);
 
       expect(res.status).toBe(409);
-      expect(createSpy).not.toHaveBeenCalled();
       createSpy.mockClear();
-    });
-  });
-
-  describe('GET /', () => {
-    it('requires valid permissions', async () => {
-      const getManySpy = jest.spyOn(userService, 'getManyUsers');
-
-      const res = await request
-        .get('/')
-        .send(userDataA);
-
-      expect(res.status).toBe(403);
-      expect(getManySpy).not.toHaveBeenCalled();
-    });
-
-    it('returns all created users', async () => {
-      const getManySpy = jest.spyOn(userService, 'getManyUsers');
-
-      const res = await request
-        .get('/')
-        .set('Authorization', 'Bearer dummy_token');
-
-      expect(res.status).toBe(200);
-      expect(res.body.length).toBe(1);
-      expect(getManySpy).toHaveBeenCalled();
-      getManySpy.mockClear();
     });
   });
 
   describe('GET /:id', () => {
     it('requires valid permissions', async () => {
-      const getSpy = jest.spyOn(userService, 'getUser');
+      const getSpy = jest.spyOn(userService, 'getUsers');
 
       const res = await request
         .get(`/${validId}`)
@@ -162,7 +134,7 @@ describe('Working user router', () => {
     });
 
     it('returns 404 when user not found', async () => {
-      const getSpy = jest.spyOn(userService, 'getUser');
+      const getSpy = jest.spyOn(userService, 'getUsers');
 
       const res = await request
         .get(`/${invalidId}`)
@@ -174,7 +146,7 @@ describe('Working user router', () => {
     });
 
     it('returns user if found', async () => {
-      const getSpy = jest.spyOn(userService, 'getUser');
+      const getSpy = jest.spyOn(userService, 'getUsers');
 
       const res = await request
         .get(`/${validId}`)
@@ -193,7 +165,7 @@ describe('Working user router', () => {
 
   describe('PATCH /:id', () => {
     it('requires valid permissions', async () => {
-      const updateSpy = jest.spyOn(userService, 'updateUser');
+      const updateSpy = jest.spyOn(userService, 'editUsers');
 
       const res = await request
         .patch(`/${validId}`)
@@ -204,12 +176,12 @@ describe('Working user router', () => {
     });
 
     it('returns 404 if user not found', async () => {
-      const updateSpy = jest.spyOn(userService, 'updateUser');
+      const updateSpy = jest.spyOn(userService, 'editUsers');
 
       const res = await request
         .patch(`/${invalidId}`)
         .set('Authorization', 'Bearer dummy_token')
-        .send({ first_name: 'Jerry' });
+        .send({ name: 'Jerry' });
 
       expect(res.status).toBe(404);
       expect(updateSpy).rejects.toThrowError();
@@ -217,7 +189,7 @@ describe('Working user router', () => {
     });
 
     it('blocks creation when field invalid', async () => {
-      const updateSpy = jest.spyOn(userService, 'updateUser');
+      const updateSpy = jest.spyOn(userService, 'editUsers');
 
       const attempts = Object.keys(userDataA).concat('otherkey').map(async (key) => {
         const UserUpdate = {
@@ -239,7 +211,7 @@ describe('Working user router', () => {
     });
 
     it('updates user when body is valid', async () => {
-      const updateSpy = jest.spyOn(userService, 'updateUser');
+      const updateSpy = jest.spyOn(userService, 'editUsers');
 
       const attempts = Object.keys(userDataB).map(async (key) => {
         const userUpdate = { [key]: userDataB[key] };
@@ -273,7 +245,7 @@ describe('Working user router', () => {
 
   describe('DELETE /:id', () => {
     it('requires valid permissions', async () => {
-      const deleteSpy = jest.spyOn(userService, 'deleteUser');
+      const deleteSpy = jest.spyOn(userService, 'deleteUsers');
 
       const res = await request.delete(`/${validId}`);
 
@@ -282,7 +254,7 @@ describe('Working user router', () => {
     });
 
     it('returns 404 if user not found', async () => {
-      const deleteSpy = jest.spyOn(userService, 'deleteUser');
+      const deleteSpy = jest.spyOn(userService, 'deleteUsers');
 
       const res = await request
         .delete(`/${invalidId}`)
@@ -294,7 +266,7 @@ describe('Working user router', () => {
     });
 
     it('deletes user', async () => {
-      const deleteSpy = jest.spyOn(userService, 'deleteUser');
+      const deleteSpy = jest.spyOn(userService, 'deleteUsers');
 
       const res = await request
         .delete(`/${validId}`)

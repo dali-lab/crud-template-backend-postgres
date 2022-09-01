@@ -1,34 +1,40 @@
 /* eslint-disable func-names */
 import passport from 'passport';
-import { Strategy as LocalStrategy } from 'passport-local';
+import { Strategy as localStrategy, IStrategyOptions } from 'passport-local';
 import { RequestHandler } from 'express';
-import { Users } from 'models';
-import { UserDoc } from 'types/models';
-
+import { userService } from 'services';
 import { getFieldNotFoundError } from 'errors';
 
-// Configure what LocalStrategy will check for as a username
-const localOptions = { usernameField: 'email' };
+const options: IStrategyOptions = {
+  usernameField: 'email',
+  passwordField: 'password',
+};
 
-// Make a login strategy to check email and password against DB
-const localLogin = new LocalStrategy(localOptions, (email, password, done) => Users.findOne({ email }, (error, user: UserDoc) => {
-  // Was a user with the given email able to be found?
-  if (error) return done(error);
-  if (!user) return done(null, false, { message: 'Email address not associated with a user' });
+passport.use(
+  'login',
+  new localStrategy(options, async (email, password, done) => {
+    try {
+      //get user object
+      const user = (await userService.getUsers({ email }))?.[0];
+      if (user == null) throw new Error('No user with this email exists.');
 
-  // Compare password associated with email and passed password
-  return user.comparePassword(password, (err, isMatch) => {
-    if (err) {
-      done(err);
-    } else if (!isMatch) {
-      done(null, false, { message: 'Incorrect password' });
-    } else {
-      done(null, user);
+      const passwordValid = await userService.isValidPassword(email, password);
+      if (!passwordValid) return done(new Error('Wrong password'), false);
+
+      // // check for verified
+      // if (!user.verified) {
+      //   // send email with verification code
+      //   sendVerificationCode(email);
+
+      //   return done(new Error("You must verify your email to gain access."));
+      // }
+
+      return done(null, user, { message: 'Logged in successfully' });
+    } catch (e) {
+      return done(e);
     }
-  });
-}));
-
-passport.use(localLogin);
+  }),
+);
 
 // Create function to transmit result of authenticate() call to user or next middleware
 const requireSignin: RequestHandler = (req, res, next) => {

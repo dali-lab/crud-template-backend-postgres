@@ -1,6 +1,5 @@
 import bcrypt from 'bcrypt';
-
-import { createUser, getUsers, editUsers, deleteUsers } from 'services';
+import { userService } from 'services';
 import { UserScopes } from 'db/models/user'; 
 import { db } from '../../server';
 
@@ -40,7 +39,7 @@ describe('userService', () => {
   
   describe('createUser', () => {
     it('Can create user A', async () => {
-      const user = await createUser(userDataA);
+      const user = await userService.createUser(userDataA);
 
       expect(user.id).toBeDefined();
       expect(user.email).toBe(userDataA.email);
@@ -58,11 +57,11 @@ describe('userService', () => {
     });
 
     it('Rejects if email already used', async () => {
-      expect(createUser(userDataA)).rejects.toBeDefined();
+      expect(userService.createUser(userDataA)).rejects.toBeDefined();
     });
 
     it('Can create user B', async () => {
-      const user = await createUser(userDataB);
+      const user = await userService.createUser(userDataB);
 
       expect(user.id).toBeDefined();
       expect(user.email).toBe(userDataB.email);
@@ -82,7 +81,7 @@ describe('userService', () => {
 
   describe('getUsers', () => {
     it('Can get user', async () => {
-      const user = await getUsers({ id: idUserA }).then((res) => res[0]);
+      const user = await userService.getUsers({ id: idUserA }).then((res) => res[0]);
 
       expect(user.email).toBe(userDataA.email);
       expect(user.password).not.toBe(userDataA.password);
@@ -90,7 +89,7 @@ describe('userService', () => {
     });
 
     it('Returns empty array if no users to get', async () => {
-      expect(await getUsers({ id: invalidId })).toStrictEqual([]);
+      expect(await userService.getUsers({ id: invalidId })).toStrictEqual([]);
     });
   });
 
@@ -98,30 +97,30 @@ describe('userService', () => {
     it('Updates user field', async () => {
       const newName = 'Jerry Jerry';
 
-      const updatedUser1 = await editUsers({ name: newName }, { id: idUserA }).then((res) => res[0]);
+      const updatedUser1 = await userService.editUsers({ name: newName }, { id: idUserA }).then((res) => res[0]);
       expect(updatedUser1.name).toBe(newName);
 
-      const updatedUser2 = await getUsers({ id: idUserA }).then((res) => res[0]);
+      const updatedUser2 = await userService.getUsers({ id: idUserA }).then((res) => res[0]);
       expect(updatedUser2.name).toBe(newName);
     });
 
     it('Returns empty array if no users to edit', async () => {
-      expect(await editUsers({ id: invalidId }, { name: 'Larry' })).toStrictEqual([]);
+      expect(await userService.editUsers({ id: invalidId }, { name: 'Larry' })).toStrictEqual([]);
     });
   });
 
   describe('deleteUsers', () => {
     it('Deletes existing user A', async () => {
-      await deleteUsers({ id: idUserA });
-      expect(await getUsers({ id: idUserA })).toStrictEqual([]);
+      await userService.deleteUsers({ id: idUserA });
+      expect(await userService.getUsers({ id: idUserA })).toStrictEqual([]);
     });
     it('Deletes existing user B', async () => {
-      await deleteUsers({ id: idUserB });
-      expect(await getUsers({ id: idUserB })).toStrictEqual([]);
+      await userService.deleteUsers({ id: idUserB });
+      expect(await userService.getUsers({ id: idUserB })).toStrictEqual([]);
     });
 
     it('Reports zero deleted rows if no users to delete', async () => {
-      expect(await deleteUsers({ id: invalidId })).toStrictEqual(0);
+      expect(await userService.deleteUsers({ id: invalidId })).toStrictEqual(0);
     });
   });
 

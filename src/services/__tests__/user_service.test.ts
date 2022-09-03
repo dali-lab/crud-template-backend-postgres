@@ -1,14 +1,11 @@
 import bcrypt from 'bcrypt';
 import { userService } from 'services';
 import { UserScopes } from 'db/models/user'; 
-import { db } from '../../server';
+import db from '../../db/db';
 import { IUser } from '../../db/models/user';
+import dotenv from 'dotenv';
 
-/*
-import {
-  connectDB, dropDB,
-} from '../../../__jest__/helpers';
-*/
+dotenv.config();
 
 let idUserA = '';
 let idUserB = '';
@@ -34,13 +31,14 @@ describe('userService', () => {
       await db.authenticate();
       await db.sync();
     } catch (error) {
+      console.log(error);
       throw new Error('Unable to connect to database...');
     }
   });
   
   describe('createUser', () => {
     it('Can create user A', async () => {
-      const user = await userService.createUser(userDataA);
+      const user: IUser = await userService.createUser(userDataA);
 
       expect(user.id).toBeDefined();
       expect(user.email).toBe(userDataA.email);
@@ -62,7 +60,7 @@ describe('userService', () => {
     });
 
     it('Can create user B', async () => {
-      const user = await userService.createUser(userDataB);
+      const user: IUser = await userService.createUser(userDataB);
 
       expect(user.id).toBeDefined();
       expect(user.email).toBe(userDataB.email);
@@ -82,7 +80,7 @@ describe('userService', () => {
 
   describe('getUsers', () => {
     it('Can get user', async () => {
-      const user = await userService.getUsers({ id: idUserA }).then((res) => res[0]);
+      const user: IUser = await userService.getUsers({ id: idUserA }).then((res) => res[0]);
 
       expect(user.email).toBe(userDataA.email);
       expect(user.password).not.toBe(userDataA.password);
@@ -98,10 +96,10 @@ describe('userService', () => {
     it('Updates user field', async () => {
       const newName = 'Jerry Jerry';
 
-      const updatedUser1 = await userService.editUsers({ name: newName }, { id: idUserA }).then((res) => res[0]);
+      const updatedUser1: IUser = await userService.editUsers({ name: newName }, { id: idUserA }).then((res) => res[0]);
       expect(updatedUser1.name).toBe(newName);
 
-      const updatedUser2 = await userService.getUsers({ id: idUserA }).then((res) => res[0]);
+      const updatedUser2: IUser = await userService.getUsers({ id: idUserA }).then((res) => res[0]);
       expect(updatedUser2.name).toBe(newName);
     });
 

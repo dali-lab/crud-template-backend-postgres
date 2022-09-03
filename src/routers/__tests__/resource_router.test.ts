@@ -1,7 +1,7 @@
 import supertest from 'supertest';
 import resourceRouter from 'routers/resource_router';
 import { resourceService } from 'services';
-import { db } from '../../server';
+import db from '../../db/db';
 import { IResource } from '../../db/models/resource';
 
 const request = supertest(resourceRouter);

@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import { ValidatedRequest } from 'express-joi-validation';
-import { getSuccessfulDeletionMessage } from 'helpers/constants';
+import { getSuccessfulDeletionMessage } from '../constants';
 import { CreateResourceRequest, UpdateResourceRequest } from 'validation/resource';
 import { resourceService } from 'services';
 import { IResource } from 'db/models/resource'; 

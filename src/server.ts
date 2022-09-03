@@ -2,17 +2,15 @@ import cors from 'cors';
 import express from 'express';
 import { createServer } from 'http';
 import morgan from 'morgan';
-import { Sequelize } from 'sequelize-typescript';
 import dotenv from 'dotenv';
 import { errorHandler } from 'errors';
 import { validationErrorHandler } from 'validation';
-
-import * as models from './db/models';
 import {
   authRouter, 
   userRouter, 
   resourceRouter,
 } from './routers';
+import db from './db/db';
 
 dotenv.config();
 
@@ -26,23 +24,6 @@ const port = process.env.PORT;
 server.listen({ port }, () => {
   console.log(`Server listening on port ${port}!`);
 });
-
-export const db = new Sequelize( // Connect the database
-  process.env.DATABASE_URL ?? '', 
-  {
-    dialect: 'postgres',
-    logging: false,
-    models: Object.values(models),
-    dialectOptions: {
-      ssl: process.env.NODE_ENV === 'production' && {
-        require: true,
-        rejectUnauthorized: false,
-      },
-    },
-  },
-);
-
-// sequelize.sync();
 
 try {
   db.authenticate();

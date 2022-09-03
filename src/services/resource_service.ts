@@ -2,7 +2,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import ResourceModel, { IResource } from 'db/models/resource';
 import { Op } from 'sequelize';
-import { DatabaseQuery } from 'types';
+import { DatabaseQuery } from '../constants';
 import { BaseError } from 'errors';
 
 export interface ResourceParams {

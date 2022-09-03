@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { RequestHandler } from 'express';
 import { ValidatedRequest } from 'express-joi-validation';
-import { getSuccessfulDeletionMessage } from 'helpers/constants';
+import { getSuccessfulDeletionMessage } from '../constants';
 import { userService } from 'services';
 import { CreateUserRequest, UpdateUserRequest } from 'validation/users';
 import { IUser } from 'db/models/user'; 

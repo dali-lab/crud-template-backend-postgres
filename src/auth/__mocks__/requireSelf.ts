@@ -1,6 +1,12 @@
 import { RequestHandler } from 'express';
-// import { isSubScope, ScopeNames } from 'authentication/scopes';
-// import { mockUser } from '../../../__jest__/helpers';
+/* import { isSubScope, ScopeNames } from 'authentication/scopes';
+import { IUser } from '../../db/models/user';
+
+const mockUser: Omit<IUser, 'id' | 'role'> = {
+  email: 'test@test.com',
+  password: 'password',
+  name: 'Joe Smith',
+};
 
 // ? How can this be mocked to test against cross-user editing?
 // const requireSelf = (adminScope: ScopeNames): RequestHandler => (req, res, next) => {
@@ -9,6 +15,7 @@ import { RequestHandler } from 'express';
 
 //   return next();
 // };
+*/
 
 const requireSelf = (): RequestHandler => (req, res, next) => {
   return next();

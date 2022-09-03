@@ -1,13 +1,10 @@
 
 import { resourceService } from 'services';
-import { db } from '../../server';
+import db from '../../db/db';
 import { IResource } from '../../db/models/resource';
+import dotenv from 'dotenv';
 
-/*
-import {
-  connectDB, dropDB,
-} from '../../../__jest__/helpers';
-*/
+dotenv.config();
 
 let idResourceA = '';
 let idResourceB = '';
@@ -37,7 +34,7 @@ describe('resourceService', () => {
 
   describe('createResource', () => {
     it('Can create resource A', async () => {
-      const resource = await resourceService.createResource(resourceDataA);
+      const resource: IResource = await resourceService.createResource(resourceDataA);
 
       expect(resource.id).toBeDefined();
       expect(resource.title).toBe(resourceDataA.title);
@@ -47,7 +44,7 @@ describe('resourceService', () => {
     });
 
     it('Can create resource B', async () => {
-      const resource = await resourceService.createResource(resourceDataB);
+      const resource: IResource = await resourceService.createResource(resourceDataB);
 
       expect(resource.id).toBeDefined();
       expect(resource.title).toBe(resourceDataB.title);
@@ -59,7 +56,7 @@ describe('resourceService', () => {
 
   describe('getResources', () => {
     it('Can get resource', async () => {
-      const resource = await resourceService.getResources({ id: idResourceA }).then((res) => res[0]);
+      const resource: IResource = await resourceService.getResources({ id: idResourceA }).then((res) => res[0]);
 
       expect(resource.title).toBe(resourceDataA.title);
       expect(resource.description).toBe(resourceDataA.description);
@@ -71,7 +68,7 @@ describe('resourceService', () => {
     });
 
     it('Gets all resources when no filter passed in', async () => {
-      const resources = await resourceService.getResources({});
+      const resources: IResource[] = await resourceService.getResources({});
       expect(resources.length).toBe(2);
     });
 
@@ -85,8 +82,7 @@ describe('resourceService', () => {
     it('Updates resource field, returns updated resource', async () => {
       const newDescription = 'Test description';
 
-      const updatedResource = await resourceService.editResources({ description: newDescription }, { id: idResourceA }).then((res) => res[0]);
-      console.log(updatedResource);
+      const updatedResource: IResource = await resourceService.editResources({ description: newDescription }, { id: idResourceA }).then((res) => res[0]);
       expect(updatedResource.description).toBe(newDescription);
     });
 

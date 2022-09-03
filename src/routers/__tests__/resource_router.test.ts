@@ -1,28 +1,24 @@
 import supertest from 'supertest';
 import resourceRouter from 'routers/resource_router';
 import { resourceService } from 'services';
-
-import { ResourceFields } from 'types/models';
-import {
-  connectDB, dropDB,
-} from '../../../__jest__/helpers';
+import { db } from '../../server';
 
 const request = supertest(resourceRouter);
 
-const resourceDataA: ResourceFields = {
+const resourceDataA = {
   title: 'Flu Season',
   description: 'Leslie comes down with the flu while planning the local Harvest Festival; Andy and Ron bond.',
   value: 32,
 };
 
-const resourceDataB: ResourceFields = {
+const resourceDataB = {
   title: 'Time Capsule',
   description: 'Leslie plans to bury a time capsule that summarizes life in Pawnee; Andy asks Chris for help.',
   value: 33,
 };
 
 let validId = '';
-const invalidId = 'invalidId';
+const invalidId = '365e5281-bbb5-467c-a92d-2f4041828948';
 
 // Mocks requireAuth server middleware
 jest.mock('../../auth/requireAuth');
@@ -31,11 +27,12 @@ jest.mock('../../auth/requireSelf');
 
 describe('Working resource router', () => {
   beforeAll(async () => {
-    connectDB();
-  });
-
-  afterAll(async () => {
-    dropDB();
+    try {
+      await db.authenticate();
+      await db.sync();
+    } catch (error) {
+      throw new Error('Unable to connect to database...');
+    }
   });
 
   describe('POST /', () => {
@@ -105,13 +102,13 @@ describe('Working resource router', () => {
       expect(createSpy).toHaveBeenCalled();
       createSpy.mockClear();
 
-      validId = String(res.body._id);
+      validId = String(res.body.id);
     });
   });
 
   describe('GET /', () => {
     it('returns all created resources', async () => {
-      const getManySpy = jest.spyOn(resourceService, 'getManyResources');
+      const getManySpy = jest.spyOn(resourceService, 'getResources');
 
       const res = await request
         .get('/')
@@ -126,7 +123,7 @@ describe('Working resource router', () => {
 
   describe('GET /:id', () => {
     it('returns 404 when resource not found', async () => {
-      const getSpy = jest.spyOn(resourceService, 'getResource');
+      const getSpy = jest.spyOn(resourceService, 'getResources');
 
       const res = await request.get(`/${invalidId}`);
 
@@ -136,7 +133,7 @@ describe('Working resource router', () => {
     });
 
     it('returns resource if found', async () => {
-      const getSpy = jest.spyOn(resourceService, 'getResource');
+      const getSpy = jest.spyOn(resourceService, 'getResources');
 
       const res = await request.get(`/${validId}`);
 
@@ -151,7 +148,7 @@ describe('Working resource router', () => {
 
   describe('PATCH /:id', () => {
     it('requires valid permissions', async () => {
-      const updateSpy = jest.spyOn(resourceService, 'updateResource');
+      const updateSpy = jest.spyOn(resourceService, 'editResources');
 
       const res = await request
         .patch(`/${validId}`)
@@ -162,7 +159,7 @@ describe('Working resource router', () => {
     });
 
     it('returns 404 if resource not found', async () => {
-      const updateSpy = jest.spyOn(resourceService, 'updateResource');
+      const updateSpy = jest.spyOn(resourceService, 'editResources');
 
       const res = await request
         .patch(`/${invalidId}`)
@@ -175,7 +172,7 @@ describe('Working resource router', () => {
     });
 
     it('blocks creation when field invalid', async () => {
-      const updateSpy = jest.spyOn(resourceService, 'updateResource');
+      const updateSpy = jest.spyOn(resourceService, 'editResources');
 
       const attempts = Object.keys(resourceDataA).concat('otherkey').map(async (key) => {
         const resourceUpdate = {
@@ -197,7 +194,7 @@ describe('Working resource router', () => {
     });
 
     it('updates resource when body is valid', async () => {
-      const updateSpy = jest.spyOn(resourceService, 'updateResource');
+      const updateSpy = jest.spyOn(resourceService, 'editResources');
 
       const attempts = Object.keys(resourceDataB).map(async (key) => {
         const resourceUpdate = { [key]: resourceDataB[key] };
@@ -225,7 +222,7 @@ describe('Working resource router', () => {
 
   describe('DELETE /:id', () => {
     it('requires valid permissions', async () => {
-      const deleteSpy = jest.spyOn(resourceService, 'deleteResource');
+      const deleteSpy = jest.spyOn(resourceService, 'deleteResources');
 
       const res = await request.delete(`/${validId}`);
 
@@ -234,7 +231,7 @@ describe('Working resource router', () => {
     });
 
     it('returns 404 if resource not found', async () => {
-      const deleteSpy = jest.spyOn(resourceService, 'deleteResource');
+      const deleteSpy = jest.spyOn(resourceService, 'deleteResources');
 
       const res = await request
         .delete(`/${invalidId}`)
@@ -246,7 +243,7 @@ describe('Working resource router', () => {
     });
 
     it('deletes resource', async () => {
-      const deleteSpy = jest.spyOn(resourceService, 'deleteResource');
+      const deleteSpy = jest.spyOn(resourceService, 'deleteResources');
 
       const res = await request
         .delete(`/${validId}`)

@@ -70,7 +70,6 @@ const getUsers = async (params: Omit<UserParams, 'password'>) => {
   try {
     return await UserModel.findAll(query);
   } catch (e : any) {
-
     throw new BaseError(e.message, 500);
   }
 };
@@ -80,7 +79,6 @@ const editUsers = async (user: Partial<IUser>, params: UserParams) => {
     params.password = await bcrypt.hash(params.password, 10);
   }
   const query = constructQuery(params);
-  console.log(query);
   return (await UserModel.update(user, { ...query, returning: true }))[1];
 };
 

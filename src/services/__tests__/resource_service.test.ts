@@ -1,13 +1,17 @@
 
 import { resourceService } from 'services';
 import { ResourceFields } from 'types/models';
+import { db } from '../../server';
 
+/*
 import {
   connectDB, dropDB,
 } from '../../../__jest__/helpers';
+*/
 
 let idResourceA = '';
-const invalidId = 'invalidId';
+let idResourceB = '';
+const invalidId = '365e5281-bbb5-467c-a92d-2f4041828948';
 
 const resourceDataA: ResourceFields = {
   title: 'Flu Season',
@@ -23,88 +27,89 @@ const resourceDataB: ResourceFields = {
 
 describe('resourceService', () => {
   beforeAll(async () => {
-    connectDB();
-  });
-
-  afterAll(async () => {
-    dropDB();
+    try {
+      await db.authenticate();
+      await db.sync();
+    } catch (error) {
+      throw new Error('Unable to connect to database...');
+    }
   });
 
   describe('createResource', () => {
-    it('Can create resource', async () => {
+    it('Can create resource A', async () => {
       const resource = await resourceService.createResource(resourceDataA);
-      idResourceA = String(resource._id);
 
-      expect(resource._id).toBeDefined();
+      expect(resource.id).toBeDefined();
       expect(resource.title).toBe(resourceDataA.title);
       expect(resource.description).toBe(resourceDataA.description);
       expect(resource.value).toBe(resourceDataA.value);
+      idResourceA = String(resource.id);
     });
 
-    it('Can create second resource', async () => {
+    it('Can create resource B', async () => {
       const resource = await resourceService.createResource(resourceDataB);
 
-      expect(resource._id).toBeDefined();
+      expect(resource.id).toBeDefined();
       expect(resource.title).toBe(resourceDataB.title);
       expect(resource.description).toBe(resourceDataB.description);
       expect(resource.value).toBe(resourceDataB.value);
+      idResourceB = String(resource.id);
     });
   });
 
-  describe('getResource', () => {
+  describe('getResources', () => {
     it('Can get resource', async () => {
-      const resource = await resourceService.getResource(idResourceA);
+      const resource = await resourceService.getResources({ id: idResourceA }).then((res) => res[0]);
 
       expect(resource.title).toBe(resourceDataA.title);
       expect(resource.description).toBe(resourceDataA.description);
       expect(resource.value).toBe(resourceDataA.value);
     });
 
-    it('Rejects if resource does not exist', async () => {
-      expect(resourceService.getResource(invalidId)).rejects.toBeDefined();
+    it('Returns empty array if no resources to get', async () => {
+      expect(resourceService.getResources({ id: invalidId })).toStrictEqual([]);
     });
-  });
 
-  describe('getManyResources', () => {
     it('Gets all resources when no filter passed in', async () => {
-      const resources = await resourceService.getManyResources({});
+      const resources = await resourceService.getResources({});
       expect(resources.length).toBe(2);
     });
 
     it('Gets all resources that match filter', async () => {
-      const resources = await resourceService.getManyResources({ value: resourceDataA.value });
+      const resources = await resourceService.getResources({ value: resourceDataA.value });
       expect(resources.length).toBe(1);
     });
   });
 
-  describe('updateResource', () => {
+  describe('editResources', () => {
     it('Updates resource field, returns updated resource', async () => {
       const newDescription = 'Test description';
 
-      const updatedResource1 = await resourceService.updateResource(idResourceA, { description: newDescription });
+      const updatedResource1 = await resourceService.editResources({ id: idResourceA }, { description: newDescription }).then((res) => res[0]);
       expect(updatedResource1.description).toBe(newDescription);
 
-      const updatedResource2 = await resourceService.getResource(idResourceA);
+      const updatedResource2 = await resourceService.getResources({ id: idResourceA }).then((res) => res[0]);
       expect(updatedResource2.description).toBe(newDescription);
     });
 
-    it('Rejects if resource does not exist', async () => {
-      expect(resourceService.updateResource(invalidId, { value: 10000 })).rejects.toBeDefined();
-    });
-
-    it('Does not add field thats not part of schema', async () => {
-      const resource = await resourceService.updateResource(idResourceA, { director: 'Wendey Stanzler' });
-      expect((resource as any).director).toBeUndefined();
+    it('Returns empty array if no resources to edit', async () => {
+      expect(await resourceService.editResources({ id: invalidId }, { value: 10000 })).toStrictEqual([]);
     });
   });
 
   describe('deleteResource', () => {
-    it('Deletes existing resource', async () => {
-      expect(resourceService.getResource(idResourceA)).rejects.toBeDefined();
+    it('Deletes existing resource A', async () => {
+      await resourceService.deleteResources({ id: idResourceA });
+      expect(await resourceService.deleteResources({ id: idResourceA })).toStrictEqual([]);
     });
-  });
 
-  it('Rejects if resource does not exist', async () => {
-    expect(resourceService.deleteResource(invalidId)).rejects.toBeDefined();
+    it('Deletes existing resource B', async () => {
+      await resourceService.deleteResources({ id: idResourceB });
+      expect(await resourceService.deleteResources({ id: idResourceA })).toStrictEqual([]);
+    });
+
+    it('Reports zero deleted rows if no resources to delete', async () => {
+      expect(await resourceService.deleteResources({ id: invalidId })).toStrictEqual(0);
+    });
   });
 });

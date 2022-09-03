@@ -1,40 +1,82 @@
-import DocumentNotFoundError from 'errors/DocumentNotFoundError';
-import { Resources } from 'models';
-import { FilterQuery, UpdateQuery } from 'mongoose';
-import { ResourceDoc, ResourceFields } from 'types/models';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { v4 as uuidv4 } from 'uuid';
+import ResourceModel, { IResource } from 'db/models/resource';
+import { Op } from 'sequelize';
+import { DatabaseQuery } from 'types';
+import { BaseError } from 'errors';
 
-const getManyResources = async (fields: FilterQuery<ResourceDoc>): Promise<ResourceDoc[]> => (
-  Resources.find(fields)
-);
+export interface ResourceParams {
+  id?: string;
+  title?: string;
+  description?: string;
+  value?: number;
+}
 
-const createResource = (fields: ResourceFields): Promise<ResourceDoc> => (
-  new Resources(fields).save()
-);
-
-const getResource = async (id: string): Promise<ResourceDoc> => {
-  const resource = await Resources.findById(id);
-  if (!resource) throw new DocumentNotFoundError(id);
-  return resource;
+const constructQuery = (params: ResourceParams) => {
+  const { id, title, description, value } = params;
+  const query: DatabaseQuery<ResourceParams> = {
+    where: {},
+  };
+  if (id) {
+    query.where.id = {
+      [Op.eq]: id,
+    };
+  }
+  if (title) {
+    query.where.title = {
+      [Op.eq]: title,
+    };
+  }
+  if (description) {
+    query.where.description = {
+      [Op.eq]: description,
+    };
+  }
+  if (value) {
+    query.limit = value;
+  }
+  return query;
 };
 
-const updateResource = async (id: string, fields: UpdateQuery<ResourceDoc>): Promise<ResourceDoc> => {
-  const updatedResource = await Resources.findByIdAndUpdate(id, fields, { new: true });
-  if (!updatedResource) throw new DocumentNotFoundError(id);
-  return updatedResource;
+const getResources = async (params: ResourceParams) => {
+  const query = constructQuery(params);
+  try {
+    return await ResourceModel.findAll(query);
+  } catch (e : any) {
+    throw new BaseError(e.message, 500);
+  }
 };
 
-const deleteResource = async (id: string): Promise<ResourceDoc> => {
-  const deletedResource = await Resources.findByIdAndDelete(id);
-  if (!deletedResource) throw new DocumentNotFoundError(id);
-  return deletedResource;
+const editResources = async (resource: Partial<IResource>, params: ResourceParams) => {
+  const query = constructQuery(params);
+  return (await ResourceModel.update(resource, { ...query, returning: true }))[1];
+};
+
+const deleteResources = async (params: ResourceParams) => {
+  const query = constructQuery(params);
+  try {
+    return await ResourceModel.destroy(query);
+  } catch (e : any) {
+    throw new BaseError(e.message, 500);
+  }
+};
+
+const createResource = async (resource: Pick<IResource, 'title' | 'description' | 'value'>) => {
+  try {
+    return await ResourceModel.create({ 
+      ...resource, 
+      id: uuidv4(),
+    });
+  } catch (e : any) {
+    throw e;
+  }
 };
 
 const resourceService = {
-  getManyResources,
+  getResources,
+  editResources,
+  deleteResources,
   createResource,
-  getResource,
-  updateResource,
-  deleteResource,
 };
 
 export default resourceService;

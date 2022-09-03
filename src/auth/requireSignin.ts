@@ -16,10 +16,10 @@ passport.use(
     try {
       //get user object
       const user = (await userService.getUsers({ email }))?.[0];
-      if (user == null) throw new Error('No user with this email exists.');
+      if (user == null) return done(null, false, { message: 'Email address not associated with a user' });
 
       const passwordValid = await userService.isValidPassword(email, password);
-      if (!passwordValid) return done(new Error('Wrong password'), false);
+      if (!passwordValid) return done(null, false, { message: 'Incorrect password' });
 
       // // check for verified
       // if (!user.verified) {
@@ -48,7 +48,7 @@ const requireSignin: RequestHandler = (req, res, next) => {
   }
 
   // eslint-disable-next-line prefer-arrow-callback
-  return passport.authenticate('local', { session: false }, function (err, user, info) {
+  return passport.authenticate('login', { session: false }, function (err, user, info) {
     // Return any existing errors
     if (err) { return next(err); }
 

@@ -19,7 +19,7 @@ passport.use(
       try {
         // use id encrypted in token to get user
         const userResult: IUser[] = await userService.getUsers({ id: token.user.id });
-        if (userResult.length == 0) return done(new Error('Invalid token.'));
+        if (userResult.length == 0) return done(null, false, { message: 'Invalid token' });
 
         return done(null, userResult[0]);
       } catch (e) {

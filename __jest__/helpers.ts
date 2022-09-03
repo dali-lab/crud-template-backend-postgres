@@ -4,8 +4,7 @@ const mongoose = require('mongoose'); // * This syntax defines `process.env.MONG
 export const mockUser = {
   email: 'test@test.com',
   password: 'password',
-  first_name: 'Joe',
-  last_name: 'Smith',
+  name: 'Joe Smith',
 };
 
 export async function connectDB() {

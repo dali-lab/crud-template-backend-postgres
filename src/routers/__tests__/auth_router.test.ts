@@ -1,21 +1,27 @@
 import supertest from 'supertest';
-
 import authRouter from 'routers/auth_router';
 import { userService } from 'services';
-import { mockUser, connectDB, dropDB } from '../../../__jest__/helpers';
+import { db } from '../../server';
 
 const request = supertest(authRouter);
 
 // Mocks requireAuth server middleware
 jest.mock('../../auth/requireAuth');
 
+const mockUser = {
+  email: 'test@test.com',
+  password: 'password',
+  name: 'Joe Smith',
+};
+
 describe('Working auth router', () => {
   beforeAll(async () => {
-    connectDB();
-  });
-
-  afterAll(async () => {
-    dropDB();
+    try {
+      await db.authenticate();
+      await db.sync();
+    } catch (error) {
+      throw new Error('Unable to connect to database...');
+    }
   });
 
   describe('POST /signup', () => {
@@ -146,3 +152,5 @@ describe('Working auth router', () => {
     });
   });
 });
+
+// TODO: Delete created user after these tests are run

@@ -2,16 +2,17 @@ import supertest from 'supertest';
 import resourceRouter from 'routers/resource_router';
 import { resourceService } from 'services';
 import { db } from '../../server';
+import { IResource } from '../../db/models/resource';
 
 const request = supertest(resourceRouter);
 
-const resourceDataA = {
+const resourceDataA: Omit<IResource, 'id'> = {
   title: 'Flu Season',
   description: 'Leslie comes down with the flu while planning the local Harvest Festival; Andy and Ron bond.',
   value: 32,
 };
 
-const resourceDataB = {
+const resourceDataB: Omit<IResource, 'id'> = {
   title: 'Time Capsule',
   description: 'Leslie plans to bury a time capsule that summarizes life in Pawnee; Andy asks Chris for help.',
   value: 33,

@@ -1,14 +1,14 @@
 import { RequestHandler } from 'express';
 import passport from 'passport';
-import { isSubScope, ScopeNames } from 'auth/scopes';
-import { IUser } from 'db/models/user';
+import { isSubScope } from 'auth/scopes';
+import { IUser, UserScopes } from 'db/models/user';
 
 /**
  * Middleware that requires a minimum scope to access the protected route
  * @param scope minimum scope to require on protected route
  * @returns express middleware handler
  */
-const requireScope = (scope: ScopeNames): RequestHandler => (req, res, next) => {
+const requireScope = (scope: UserScopes): RequestHandler => (req, res, next) => {
   passport.authenticate('jwt', { session: false }, function (err, user: IUser, info) {
     if (err) { return next(err); }
     if (!user) { return res.status(401).json({ message: info?.message || 'Error authenticating email and password' }); }

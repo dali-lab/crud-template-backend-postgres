@@ -1,7 +1,7 @@
 
 import { resourceService } from 'services';
-import { ResourceFields } from 'types/models';
 import { db } from '../../server';
+import { IResource } from '../../db/models/resource';
 
 /*
 import {
@@ -11,15 +11,15 @@ import {
 
 let idResourceA = '';
 let idResourceB = '';
-const invalidId = '365e5281-bbb5-467c-a92d-2f4041828948';
+const invalidId = '3fe847d8-2074-4ed7-a51c-e10fb1053c9e';
 
-const resourceDataA: ResourceFields = {
+const resourceDataA: Omit<IResource, 'id'> = {
   title: 'Flu Season',
   description: 'Leslie comes down with the flu while planning the local Harvest Festival; Andy and Ron bond.',
   value: 32,
 };
 
-const resourceDataB: ResourceFields = {
+const resourceDataB: Omit<IResource, 'id'> = {
   title: 'Time Capsule',
   description: 'Leslie plans to bury a time capsule that summarizes life in Pawnee; Andy asks Chris for help.',
   value: 33,
@@ -67,7 +67,7 @@ describe('resourceService', () => {
     });
 
     it('Returns empty array if no resources to get', async () => {
-      expect(resourceService.getResources({ id: invalidId })).toStrictEqual([]);
+      expect(await resourceService.getResources({ id: invalidId })).toStrictEqual([]);
     });
 
     it('Gets all resources when no filter passed in', async () => {
@@ -85,11 +85,9 @@ describe('resourceService', () => {
     it('Updates resource field, returns updated resource', async () => {
       const newDescription = 'Test description';
 
-      const updatedResource1 = await resourceService.editResources({ id: idResourceA }, { description: newDescription }).then((res) => res[0]);
-      expect(updatedResource1.description).toBe(newDescription);
-
-      const updatedResource2 = await resourceService.getResources({ id: idResourceA }).then((res) => res[0]);
-      expect(updatedResource2.description).toBe(newDescription);
+      const updatedResource = await resourceService.editResources({ description: newDescription }, { id: idResourceA }).then((res) => res[0]);
+      console.log(updatedResource);
+      expect(updatedResource.description).toBe(newDescription);
     });
 
     it('Returns empty array if no resources to edit', async () => {
@@ -100,12 +98,12 @@ describe('resourceService', () => {
   describe('deleteResource', () => {
     it('Deletes existing resource A', async () => {
       await resourceService.deleteResources({ id: idResourceA });
-      expect(await resourceService.deleteResources({ id: idResourceA })).toStrictEqual([]);
+      expect(await resourceService.getResources({ id: idResourceA })).toStrictEqual([]);
     });
 
     it('Deletes existing resource B', async () => {
       await resourceService.deleteResources({ id: idResourceB });
-      expect(await resourceService.deleteResources({ id: idResourceA })).toStrictEqual([]);
+      expect(await resourceService.getResources({ id: idResourceA })).toStrictEqual([]);
     });
 
     it('Reports zero deleted rows if no resources to delete', async () => {

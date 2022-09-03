@@ -22,13 +22,8 @@ module.exports = {
         allowNull: false,
       },
       role: {
-        type: Sequelize.ENUM('USER', 'ADMIN'),
+        type: Sequelize.ENUM('UNVERIFIED-USER', 'USER', 'ADMIN'),
         defaultValue: 'USER',
-        allowNull: false,
-      },
-      verified: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
         allowNull: false,
       },
       createdAt: {

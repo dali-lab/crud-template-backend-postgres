@@ -11,7 +11,6 @@ export interface UserParams {
   email?: string;
   password?: string;
   name?: string;
-  verified?: string;
   role?: string;
 
   limit?: number;
@@ -19,7 +18,7 @@ export interface UserParams {
 }
 
 const constructQuery = (params: UserParams) => {
-  const { id, email, password, name, verified, role, limit = 30, offset = 0 } = params;
+  const { id, email, password, name, role, limit = 30, offset = 0 } = params;
   const query: DatabaseQuery<UserParams> & {
     attributes: { exclude: string[] };
   } = {
@@ -49,11 +48,6 @@ const constructQuery = (params: UserParams) => {
   if (role) {
     query.where.role = {
       [Op.eq]: role,
-    };
-  }
-  if (verified) {
-    query.where.verified = {
-      [Op.eq]: verified,
     };
   }
   if (limit) {
@@ -122,8 +116,7 @@ const createUser = async (user: Pick<IUser, 'email' | 'password' | 'name'>) => {
       return await UserModel.create({ 
         ...user, 
         id: uuidv4(),
-        role: UserScopes.User, 
-        verified: false,
+        role: UserScopes.User, // should be UserScopes.UNVERIFIED
       });
     } catch (e : any) {
       throw e;

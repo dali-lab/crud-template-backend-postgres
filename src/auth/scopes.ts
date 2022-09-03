@@ -1,23 +1,29 @@
-export type ScopeNames = 'ADMIN' | 'USER';
+import { UserScopes } from 'db/models/user';
 
 interface IScope {
-  name: ScopeNames,
-  subscopes: Set<ScopeNames>
+  name: UserScopes,
+  subscopes: Set<UserScopes>
 }
 
 const AdminScope: IScope = {
-  name: 'ADMIN',
-  subscopes: new Set<ScopeNames>(['USER']),
+  name: UserScopes.Admin,
+  subscopes: new Set<UserScopes>([UserScopes.User]),
 };
 
 const UserScope: IScope = {
-  name: 'USER',
+  name: UserScopes.User,
   subscopes: new Set([]),
 };
 
-export const SCOPES: Record<ScopeNames, IScope> = {
+const UnverifiedScope: IScope = {
+  name: UserScopes.Unverified,
+  subscopes: new Set([]),
+};
+
+export const SCOPES: Record<UserScopes, IScope> = {
   ADMIN: AdminScope,
   USER: UserScope,
+  UNVERIFIED: UnverifiedScope,
 };
 
 /**
@@ -26,7 +32,7 @@ export const SCOPES: Record<ScopeNames, IScope> = {
  * @param s2 scope that is potentially the subscope
  * @returns whether s2 is a subscope of s1
  */
-export const isSubScope = (s1: ScopeNames, s2: ScopeNames) => {
+export const isSubScope = (s1: UserScopes, s2: UserScopes) => {
   if (s1 == s2) { return true; }
   if (!SCOPES[s1].subscopes.size) { return false; }
 

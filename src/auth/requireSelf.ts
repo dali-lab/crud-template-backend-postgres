@@ -1,13 +1,13 @@
 import { RequestHandler } from 'express';
-import { isSubScope, ScopeNames } from 'auth/scopes';
-import { IUser } from 'db/models/user';
+import { isSubScope } from 'auth/scopes';
+import { IUser, UserScopes } from 'db/models/user';
 
 /**
  * Middleware enforcing that a user can only edit their own model (user id matches params.id)
  * @param adminScope scope that will override user and params id matching
  * @returns express request handler
  */
-const requireSelf = (adminScope: ScopeNames): RequestHandler => (req, res, next) => {
+const requireSelf = (adminScope: UserScopes): RequestHandler => (req, res, next) => {
   const user = req.user as IUser;
 
   if (!user) { return res.status(400).json({ message: 'No user object attached' }); }

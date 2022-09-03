@@ -22,7 +22,7 @@ passport.use(
       if (!passwordValid) return done(null, false, { message: 'Incorrect password' });
 
       // // check for verified
-      // if (!user.verified) {
+      // if (!user.role === verified) {
       //   // send email with verification code
       //   sendVerificationCode(email);
 

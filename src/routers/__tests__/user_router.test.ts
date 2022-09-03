@@ -2,19 +2,20 @@ import supertest from 'supertest';
 import userRouter from 'routers/user_router';
 import { userService } from 'services';
 import { db } from '../../server';
+import { IUser } from '../../db/models/user';
 
 const request = supertest(userRouter);
 
 let validId = '';
 const invalidId = '365e5281-bbb5-467c-a92d-2f4041828948';
 
-const userDataA = {
+const userDataA: Omit<IUser, 'id' | 'role'> = {
   email: 'garrygergich@test.com',
   password: 'muncie',
   name: 'Garry Gergich',
 };
 
-const userDataB = {
+const userDataB: Omit<IUser, 'id' | 'role'> = {
   email: 'benwyatt@test.com',
   password: 'icetown',
   name: 'Ben Wyatt',

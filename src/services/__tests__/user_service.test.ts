@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import { userService } from 'services';
 import { UserScopes } from 'db/models/user'; 
 import { db } from '../../server';
+import { IUser } from '../../db/models/user';
 
 /*
 import {
@@ -13,14 +14,14 @@ let idUserA = '';
 let idUserB = '';
 const invalidId = '365e5281-bbb5-467c-a92d-2f4041828948';
 
-const userDataA = {
+const userDataA: Omit<IUser, 'id'> = {
   email: 'garrygergich@test.com',
   password: 'muncie',
   name: 'Garry Gergich',
   role: UserScopes.User,
 };
 
-const userDataB = {
+const userDataB: Omit<IUser, 'id'> = {
   email: 'benwyatt@test.com',
   password: 'icetown',
   name: 'Ben Wyatt',

@@ -2,13 +2,14 @@ import supertest from 'supertest';
 import authRouter from 'routers/auth_router';
 import { userService } from 'services';
 import { db } from '../../server';
+import { IUser } from '../../db/models/user';
 
 const request = supertest(authRouter);
 
 // Mocks requireAuth server middleware
 jest.mock('../../auth/requireAuth');
 
-const mockUser = {
+const mockUser: Omit<IUser, 'id' | 'role'> = {
   email: 'test@test.com',
   password: 'password',
   name: 'Joe Smith',

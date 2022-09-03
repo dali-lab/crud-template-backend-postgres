@@ -6,7 +6,7 @@ import { ValidatedRequest } from 'express-joi-validation';
 
 import { userService } from 'services';
 import { IUser } from 'db/models/user';
-import { RequestWithJWT } from 'types/requests';
+import { RequestWithJWT } from 'auth/requests';
 import { SignUpUserRequest } from 'validation/auth';
 
 dotenv.config();

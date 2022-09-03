@@ -3,6 +3,7 @@ import express from 'express';
 import { createValidator } from 'express-joi-validation';
 
 import requireScope from 'auth/requireScope';
+import { UserScopes } from 'db/models/user'; 
 import { resourceController } from 'controllers';
 import { errorHandler } from 'errors';
 import { validationErrorHandler } from 'validation';
@@ -21,11 +22,11 @@ if (process.env.NODE_ENV === 'test') {
 // find and return all resources
 router.route('/')
   .get(
-    requireScope('ADMIN'),
+    requireScope(UserScopes.Admin),
     resourceController.getAllResources,
   )
   .post(
-    requireScope('USER'),
+    requireScope(UserScopes.User),
     validator.body(CreateResourceSchema),
     resourceController.createResource,
   );
@@ -35,12 +36,12 @@ router.route('/:id')
     resourceController.getResource,
   )
   .patch(
-    requireScope('USER'),
+    requireScope(UserScopes.User),
     validator.body(UpdateResourceSchema),
     resourceController.updateResource,
   )
   .delete(
-    requireScope('USER'),
+    requireScope(UserScopes.User),
     resourceController.deleteResource,
   );
 

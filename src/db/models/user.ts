@@ -12,6 +12,7 @@ import {
 import bcrypt from 'bcrypt';
 
 export enum UserScopes {
+  Unverified = 'UNVERIFIED',
   User = 'USER',
   Admin = 'ADMIN',
 }
@@ -22,7 +23,6 @@ export interface IUser {
   password: string; // encrypted
   name: string;
   role: UserScopes;
-  verified: boolean; // True if user has verified their account via email
 }
 
 @Table({
@@ -48,13 +48,8 @@ class User extends Model<IUser> implements IUser {
     name: string;
 
   @AllowNull(false)
-  @Column(DataTypes.ENUM({ values: ['USER', 'ADMIN'] }))
+  @Column(DataTypes.ENUM({ values: ['UNVERIFIED', 'USER', 'ADMIN'] }))
     role: UserScopes;
-
-  @Default(false)
-  @AllowNull(false)
-  @Column(DataTypes.BOOLEAN)
-    verified: boolean;
 
   @BeforeCreate
   static encryptPassword = async (instance: IUser) => {

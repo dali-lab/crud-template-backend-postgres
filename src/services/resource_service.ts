@@ -33,7 +33,9 @@ const constructQuery = (params: ResourceParams) => {
     };
   }
   if (value) {
-    query.limit = value;
+    query.where.value = {
+      [Op.eq]: value,
+    };
   }
   return query;
 };

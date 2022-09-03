@@ -1,5 +1,5 @@
 import resourceService from './resource_service';
-import userService from './user-service';
+import userService from './user_service';
 
 export {
   userService,

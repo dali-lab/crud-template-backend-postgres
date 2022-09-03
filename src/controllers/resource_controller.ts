@@ -1,13 +1,14 @@
 import { RequestHandler } from 'express';
 import { ValidatedRequest } from 'express-joi-validation';
-
 import { getSuccessfulDeletionMessage } from 'helpers/constants';
 import { CreateResourceRequest, UpdateResourceRequest } from 'validation/resource';
 import { resourceService } from 'services';
+import { IResource } from 'db/models/resource'; 
+import { BaseError } from 'errors';
 
 const getAllResources: RequestHandler = async (req, res, next) => {
   try {
-    const resources = await resourceService.getManyResources({});
+    const resources = await resourceService.getResources({});
     res.status(200).json(resources);
   } catch (error) {
     next(error);
@@ -25,8 +26,9 @@ const createResource: RequestHandler = async (req: ValidatedRequest<CreateResour
 
 const getResource: RequestHandler = async (req, res, next) => {
   try {
-    const resource = await resourceService.getResource(req.params.id);
-    res.status(200).send(resource);
+    const resources : IResource[] = await resourceService.getResources({ id: req.params.id });
+    if (resources.length === 0) throw new BaseError('User not found', 404);
+    else res.status(200).json(resources[0]);
   } catch (error) {
     next(error);
   }
@@ -34,9 +36,16 @@ const getResource: RequestHandler = async (req, res, next) => {
 
 const updateResource: RequestHandler = async (req: ValidatedRequest<UpdateResourceRequest>, res, next) => {
   try {
-    // ! Don't let user update protected fields
-    const resource = await resourceService.updateResource(req.params.id, req.body);
-    res.status(200).json(resource);
+    // ! Only allow user to update certain fields (avoids privilege elevation)
+    const { title, description, value } = req.body;
+    
+    const updatedResources = await resourceService.editResources(
+      { title, description, value },
+      { id: req.params.id },
+    );
+
+    if (updatedResources.length === 0) throw new BaseError('Resource not found', 404);
+    else res.status(200).json(updatedResources[0]);
   } catch (error) {
     next(error);
   }
@@ -44,8 +53,12 @@ const updateResource: RequestHandler = async (req: ValidatedRequest<UpdateResour
 
 const deleteResource: RequestHandler = async (req, res, next) => {
   try {
-    await resourceService.deleteResource(req.params.id);
-    res.status(200).json({ message: getSuccessfulDeletionMessage(req.params.id) });
+    const resources : IResource[] = await resourceService.getResources({ id: req.params.id });
+    if (resources.length === 0) throw new BaseError('Resource not found', 404);
+    else {
+      await resourceService.deleteResources({ id: req.params.id });
+      res.status(200).json({ message: getSuccessfulDeletionMessage(req.params.id) });
+    }
   } catch (error) {
     next(error);
   }

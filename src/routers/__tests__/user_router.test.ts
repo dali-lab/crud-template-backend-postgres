@@ -1,5 +1,4 @@
 import supertest from 'supertest';
-// import { connectDB, dropDB } from '../../../__jest__/helpers';
 import userRouter from 'routers/user_router';
 import { userService } from 'services';
 import { db } from '../../server';

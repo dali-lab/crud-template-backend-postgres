@@ -35,7 +35,7 @@ class Resource extends Model<IResource> implements IResource {
     description: string;
 
   @AllowNull(false)
-  @Column(DataTypes.STRING)
+  @Column(DataTypes.FLOAT)
     value: number;
 }
 

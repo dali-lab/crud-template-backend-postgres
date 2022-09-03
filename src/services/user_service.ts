@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import UserModel, { IUser, UserScopes } from 'db/models/user';
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
-import { DatabaseQuery } from 'types';
+import { DatabaseQuery } from '../constants';
 import { BaseError } from 'errors';
 
 export interface UserParams {

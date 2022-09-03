@@ -1,6 +1,12 @@
 import { RequestHandler } from 'express';
 // import { ScopeNames } from 'authentication/scopes';
-import { mockUser } from '../../../__jest__/helpers';
+import { IUser } from '../../db/models/user';
+
+const mockUser: Omit<IUser, 'id' | 'role'> = {
+  email: 'test@test.com',
+  password: 'password',
+  name: 'Joe Smith',
+};
 
 const requireScope = (): RequestHandler => (req, res, next) => {
   // Reject with 403 if user scope is not sufficient

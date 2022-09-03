@@ -1,7 +1,7 @@
 import supertest from 'supertest';
 import authRouter from 'routers/auth_router';
 import { userService } from 'services';
-import { db } from '../../server';
+import db from '../../db/db';
 import { IUser } from '../../db/models/user';
 
 const request = supertest(authRouter);

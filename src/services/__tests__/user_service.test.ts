@@ -122,5 +122,4 @@ describe('userService', () => {
       expect(await userService.deleteUsers({ id: invalidId })).toStrictEqual(0);
     });
   });
-
 });

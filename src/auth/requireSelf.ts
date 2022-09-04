@@ -9,7 +9,7 @@ import { IUser, UserScopes } from 'db/models/user';
  */
 const requireSelf = (adminScope: UserScopes): RequestHandler => (req, res, next) => {
   const user = req.user as IUser;
-
+  console.log('here in requireSelf',  user);
   if (!user) { return res.status(400).json({ message: 'No user object attached' }); }
   if (!req.params.id) { return res.status(400).json({ message: 'Invalid URL id' }); }
 

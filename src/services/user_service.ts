@@ -116,10 +116,10 @@ const createUser = async (user: Pick<IUser, 'email' | 'password' | 'name'>) => {
       return await UserModel.create({ 
         ...user, 
         id: uuidv4(),
-        role: UserScopes.User, // should be UserScopes.UNVERIFIED
+        role: UserScopes.Unverified,
       });
     } catch (e : any) {
-      throw e;
+      throw new BaseError(e.message, 500);
     }
   } else {
     throw new BaseError('Email address already associated to a user', 409);

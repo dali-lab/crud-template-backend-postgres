@@ -1,19 +1,25 @@
+import { Op } from 'sequelize';
 import supertest from 'supertest';
 import authRouter from 'routers/auth_router';
-import { userService } from 'services';
+import { userService, verificationCodeService } from 'services';
 import db from '../../db/db';
-import { IUser } from '../../db/models/user';
+import UserModel, { IUser, UserScopes } from '../../db/models/user';
 
 const request = supertest(authRouter);
 
 // Mocks requireAuth server middleware
 jest.mock('../../auth/requireAuth');
+jest.mock('../../auth/requireScope');
+jest.mock('../../auth/requireSelf');
 
 const mockUser: Omit<IUser, 'id' | 'role'> = {
   email: 'test@test.com',
   password: 'password',
   name: 'Joe Smith',
 };
+
+let userId  = '';
+let code = '';
 
 describe('Working auth router', () => {
   beforeAll(async () => {
@@ -22,6 +28,18 @@ describe('Working auth router', () => {
       await db.sync();
     } catch (error) {
       throw new Error('Unable to connect to database...');
+    }
+  });
+
+  afterAll(async () => {
+    // Cleanup
+    try {
+      await UserModel.destroy({
+        where: { id: { [Op.eq]: userId } },
+      });
+    } catch (error) {
+      console.log(error);
+      throw new Error('Error while cleaning verifiation code service tests...');
     }
   });
 
@@ -83,6 +101,8 @@ describe('Working auth router', () => {
 
       expect(createSpy).toHaveBeenCalled();
       createSpy.mockClear();
+
+      userId = res.body.user.id;
     });
   });
 
@@ -150,6 +170,108 @@ describe('Working auth router', () => {
         .forEach((key) => {
           expect(res.body.user[key]).toBe(mockUser[key]);
         });
+    });
+  });
+
+  describe('POST /resend-code', () => {
+    it('requires valid permissions', async () => {
+      const resendSpy = jest.spyOn(verificationCodeService, 'createVerificationCode');
+
+      const res = await request
+        .post('/resend-code')
+        .send({ email: mockUser.email });
+
+      expect(res.status).toBe(403);
+      expect(resendSpy).not.toHaveBeenCalled();
+    });
+
+    it('blocks creation when field invalid', async () => {
+      const resendSpy = jest.spyOn(verificationCodeService, 'createVerificationCode');
+
+      const res = await request
+        .post('/resend-code')
+        .set('Authorization', 'Bearer dummy_token')
+        .send({ email: 'fakeemail@test.com' });
+
+      expect(res.status).toBe(400);
+      expect(res.body.errors.length).toBe(1);
+      expect(resendSpy).not.toHaveBeenCalled();
+    });
+
+    it('creates resource when body is valid', async () => {
+      const resendSpy = jest.spyOn(verificationCodeService, 'createVerificationCode');
+
+      const res = await request
+        .post('/resend-code')
+        .set('Authorization', 'Bearer dummy_token')
+        .send({ email: mockUser.email });
+
+      expect(res.status).toBe(201);
+      expect(res.body.email).toBe(mockUser.email);
+      expect(res.body.code).toBeDefined();
+      expect(resendSpy).toHaveBeenCalled();
+      resendSpy.mockClear();
+
+      code = res.body.code.code;
+    });
+  });
+
+  describe('PATCH /verify', () => {
+    it('requires valid permissions', async () => {
+      const verifySpy = jest.spyOn(verificationCodeService, 'createVerificationCode');
+
+      const res = await request
+        .patch('/verify')
+        .send({ email: mockUser.email });
+
+      expect(res.status).toBe(403);
+      expect(verifySpy).not.toHaveBeenCalled();
+    });
+
+    it('blocks verification when field invalid', async () => {
+      const verifySpy = jest.spyOn(verificationCodeService, 'createVerificationCode');
+
+      const res1 = await request
+        .patch('/verify')
+        .set('Authorization', 'Bearer dummy_token')
+        .send({ email: 'fakeemail@test.com', code });
+
+      expect(res1.status).toBe(404);
+      expect(res1.body.errors.length).toBe(1);
+      expect(verifySpy).not.toHaveBeenCalled();
+
+      const res2 = await request
+        .patch('/verify')
+        .set('Authorization', 'Bearer dummy_token')
+        .send({ email: mockUser.email, code: 'not a code' });
+
+      expect(res2.status).toBe(401);
+      expect(res2.body.errors.length).toBe(1);
+      expect(verifySpy).not.toHaveBeenCalled();
+    });
+
+    it('verifies user when body is valid', async () => {
+      const verifySpy = jest.spyOn(verificationCodeService, 'verifyVerificationCode');
+
+      const res = await request
+        .patch('/verify')
+        .set('Authorization', 'Bearer dummy_token')
+        .send({ email: mockUser.email, code });
+
+      expect(res.status).toBe(200);
+      expect(res.body.token).toBeDefined();
+      Object.keys(mockUser)
+        .filter((key) => key !== 'password')
+        .forEach((key) => {
+          if (key === 'role') {
+            expect(res.body.user[key]).toBe(UserScopes.User);
+          } else {
+            expect(res.body.user[key]).toBe(mockUser[key]);
+          }
+        });
+
+      expect(verifySpy).toHaveBeenCalled();
+      verifySpy.mockClear();
     });
   });
 });

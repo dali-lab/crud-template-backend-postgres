@@ -1,7 +1,6 @@
 import bodyParser from 'body-parser';
 import express from 'express';
 import { createValidator } from 'express-joi-validation';
-
 import requireScope from 'auth/requireScope';
 import { UserScopes } from 'db/models/user'; 
 import { resourceController } from 'controllers';

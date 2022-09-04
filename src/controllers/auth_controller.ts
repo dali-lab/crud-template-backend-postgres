@@ -4,10 +4,11 @@ import env from 'env-var';
 import { RequestHandler } from 'express';
 import { ValidatedRequest } from 'express-joi-validation';
 
-import { userService } from 'services';
+import { userService, verificationCodeService } from 'services';
 import { IUser } from 'db/models/user';
 import { RequestWithJWT } from 'auth/requests';
-import { SignUpUserRequest } from 'validation/auth';
+import { ResendCodeRequest, SignUpUserRequest, VerifyUserRequest } from 'validation/auth';
+import { BaseError } from 'errors';
 
 dotenv.config();
 
@@ -32,7 +33,7 @@ const signUpUser: RequestHandler = async (req: ValidatedRequest<SignUpUserReques
 
     // Save the user then transmit to frontend
     res.status(201).json({ token: tokenForUser(savedUser), user: savedUser });
-  } catch (error) {
+  } catch (error : any) {
     next(error);
   }
 };
@@ -45,10 +46,42 @@ const jwtSignIn: RequestHandler = (req: RequestWithJWT, res) => (
   res.json({ user: req.user })
 );
 
+const resendCode: RequestHandler = async (req: ValidatedRequest<ResendCodeRequest>, res, next) => {
+  try {
+    const {
+      email,
+    } = req.body;
+
+    const users: IUser[] = await userService.getUsers({ email });
+    if (users.length === 0) throw new BaseError('No user with that email', 400);
+    
+    const newCode = await verificationCodeService.createVerificationCode({ email });
+    res.status(201).json({ email, code: newCode });
+  } catch (error : any) {
+    next(error);
+  }
+}; 
+
+const verifyUser: RequestHandler = async (req: ValidatedRequest<VerifyUserRequest>, res, next) => {
+  try {
+    const {
+      email, code,
+    } = req.body;
+
+    const user = await verificationCodeService.verifyVerificationCode({ email, code });
+
+    res.status(200).json({ token: tokenForUser(user), user });
+  } catch (error : any) {
+    next(error);
+  }
+};
+
 const authController = {
   signUpUser,
   signInUser,
   jwtSignIn,
+  resendCode,
+  verifyUser,
 };
 
 export default authController;

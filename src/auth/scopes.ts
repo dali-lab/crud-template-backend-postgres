@@ -7,7 +7,7 @@ interface IScope {
 
 const AdminScope: IScope = {
   name: UserScopes.Admin,
-  subscopes: new Set<UserScopes>([UserScopes.User]),
+  subscopes: new Set<UserScopes>([UserScopes.User, UserScopes.Unverified]),
 };
 
 const UserScope: IScope = {

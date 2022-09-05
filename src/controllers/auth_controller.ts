@@ -1,9 +1,9 @@
 import jwt from 'jwt-simple';
 import dotenv from 'dotenv';
 import env from 'env-var';
+import nodemailer from 'nodemailer';
 import { RequestHandler } from 'express';
 import { ValidatedRequest } from 'express-joi-validation';
-
 import { userService, verificationCodeService } from 'services';
 import { IUser } from 'db/models/user';
 import { RequestWithJWT } from 'auth/requests';
@@ -11,6 +11,18 @@ import { ResendCodeRequest, SignUpUserRequest, VerifyUserRequest } from 'validat
 import { BaseError } from 'errors';
 
 dotenv.config();
+
+// create reusable transporter object using the default SMTP transport
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.GOOGLE_CLIENT_EMAIL,
+    pass: process.env.GOOGLE_CLIENT_PASS,
+  },
+  from: process.env.GOOGLE_CLIENT_EMAIL,
+});
 
 const tokenForUser = (user: IUser): string => {
   const timestamp = new Date().getTime();
@@ -29,6 +41,14 @@ const signUpUser: RequestHandler = async (req: ValidatedRequest<SignUpUserReques
       email,
       password,
       name,
+    });
+
+    const codePayload = await verificationCodeService.createVerificationCode({ email });
+    await transporter.sendMail({
+      from: `App <${process.env.GOOGLE_CLIENT_EMAIL}>`, 
+      to: email,
+      subject: 'Verification Code', 
+      html: `<html><p>You must enter this code in the app before you can gain access. Your code is:</p><p>${codePayload.code}</p><p>It will expire in 5 minutes.</p></html>`,
     });
 
     // Save the user then transmit to frontend
@@ -55,8 +75,15 @@ const resendCode: RequestHandler = async (req: ValidatedRequest<ResendCodeReques
     const users: IUser[] = await userService.getUsers({ email });
     if (users.length === 0) throw new BaseError('No user with that email', 400);
     
-    const newCode = await verificationCodeService.createVerificationCode({ email });
-    res.status(201).json({ email, code: newCode });
+    const codePayload = await verificationCodeService.createVerificationCode({ email });
+    await transporter.sendMail({
+      from: `App <${process.env.GOOGLE_CLIENT_EMAIL}>`, 
+      to: email,
+      subject: 'Verification Code', 
+      html: `<html><p>You must enter this code in the app before you can gain access. Your code is:</p><p>${codePayload.code}</p><p>It will expire in 5 minutes.</p></html>`,
+    });
+    
+    res.status(201).json({ email, code: codePayload });
   } catch (error : any) {
     next(error);
   }

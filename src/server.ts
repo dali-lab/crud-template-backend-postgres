@@ -33,6 +33,9 @@ try {
 }
 
 // declare routers
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
 app.use('/auth', authRouter); // NOTE: Not secured
 app.use('/users', userRouter); // NOTE: Completely secured to users
 app.use('/resources', resourceRouter); // NOTE: Partially secured to users

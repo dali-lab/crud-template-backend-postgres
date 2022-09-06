@@ -24,6 +24,16 @@ const transporter = nodemailer.createTransport({
   from: process.env.GOOGLE_CLIENT_EMAIL,
 });
 
+// Delete password field when sending through HTTP
+const protectUserResponse = (user: IUser): Omit<IUser, 'password'> => {
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+  };
+};
+
 const tokenForUser = (user: IUser): string => {
   const timestamp = new Date().getTime();
   const exp = Math.round((timestamp + 2.628e+9) / 1000);
@@ -52,18 +62,18 @@ const signUpUser: RequestHandler = async (req: ValidatedRequest<SignUpUserReques
     });
 
     // Save the user then transmit to frontend
-    res.status(201).json({ token: tokenForUser(savedUser), user: savedUser });
+    res.status(201).json({ token: tokenForUser(savedUser), user: protectUserResponse(savedUser) });
   } catch (error : any) {
     next(error);
   }
 };
 
 const signInUser: RequestHandler = (req: RequestWithJWT, res) => (
-  res.json({ token: tokenForUser(req.user), user: req.user })
+  res.json({ token: tokenForUser(req.user), user: protectUserResponse(req.user) })
 );
 
 const jwtSignIn: RequestHandler = (req: RequestWithJWT, res) => (
-  res.json({ user: req.user })
+  res.json({ user: protectUserResponse(req.user) })
 );
 
 const resendCode: RequestHandler = async (req: ValidatedRequest<ResendCodeRequest>, res, next) => {

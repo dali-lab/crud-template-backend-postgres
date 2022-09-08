@@ -4,7 +4,7 @@ This repository is the default backend starter pack for new DALI React projects.
 
 ## Tech Stack
   - [Express](https://expressjs.com/)
-  - [Postgres](https://www.postgresql.org/)
+  - [PostgreSQL](https://www.postgresql.org/)
   - [Sequelize](https://sequelize.org/)
   - [sequelize-typescript](https://www.npmjs.com/package/sequelize-typescript)
   - [Passport.js](https://www.passportjs.org/)
@@ -36,17 +36,17 @@ This repository is the default backend starter pack for new DALI React projects.
 ## Setup
 
 1. clone repo and `npm install`
-2. Install Postgres + management tool
+2. Install PostgreSQL + management tool
   - Windows
     - Install [Windows Subsystem for Linux (WSL)](https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-10#1-overview)
-    - Follow directions [here](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-database#install-postgresql) to install Postgres on WSL
+    - Follow directions [here](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-database#install-postgresql) to install PostgreSQL on WSL
     - Install [pgAdmin](https://www.pgadmin.org/)
-    - Follow directions [here](https://www.vultr.com/docs/install-pgadmin-4-for-postgresql-database-server-on-ubuntu-linux/) to connect pgAdmin to PostgresS and WSL
+    - Follow directions [here](https://www.vultr.com/docs/install-pgadmin-4-for-postgresql-database-server-on-ubuntu-linux/) to connect pgAdmin to PostgreSQL and WSL
   - MacOS
     - Ensure [Homebrew](https://brew.sh/) is installed
-    - Run `brew install postgresql` if Postgres isn't installed
-    - If you'd like to use a GUI to interact with Postgres, download one. We recommend [Postico](https://eggerapps.at/postico/)
-3. Create a Postgres DB called `backend_template` if setting up locally, using your GUI of choice (Postico or pgAdmin).
+    - Run `brew install postgresql` if PostgreSQL isn't installed
+    - If you'd like to use a GUI to interact with PostgreSQL, download one. We recommend [Postico](https://eggerapps.at/postico/)
+3. Create a PostgreSQL DB called `backend_template` if setting up locally, using your GUI of choice (Postico or pgAdmin).
 4. Create a `.env` file in the root directory
   - Should be in the following format:
   - ```

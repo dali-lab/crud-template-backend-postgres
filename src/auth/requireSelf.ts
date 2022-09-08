@@ -8,13 +8,19 @@ import { IUser, UserScopes } from 'db/models/user';
  * @returns express request handler
  */
 const requireSelf = (adminScope: UserScopes): RequestHandler => (req, res, next) => {
-  const user = req.user as IUser;
-  if (!user) { return res.status(400).json({ message: 'No user object attached' }); }
-  if (!req.params.id) { return res.status(400).json({ message: 'Invalid URL id' }); }
+  try {
+    const user = req.user as IUser;
 
-  if (req.user !== req.params.id && !isSubScope(user.role, adminScope)) { return res.status(403).json({ message: 'Unauthorized' }); }
+    if (!user) { return res.status(400).json({ message: 'No user object attached' }); }
+    if (!req.params.id) { return res.status(400).json({ message: 'Invalid URL id' }); }
 
-  return next();
+    if (user.id !== req.params.id && !isSubScope(user.role, adminScope)) { return res.status(403).json({ message: 'Unauthorized' }); }
+
+    return next();
+  } catch (e: any) {
+    console.log(e);
+    throw e;
+  }
 };
 
 export default requireSelf;

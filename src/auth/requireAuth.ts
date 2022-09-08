@@ -18,7 +18,7 @@ passport.use(
     async (token, done) => {
       try {
         // use id encrypted in token to get user
-        const userResult: IUser[] = await userService.getUsers({ id: token.sub.id });
+        const userResult: IUser[] = await userService.getUsers({ id: token.sub });
         if (userResult.length == 0) return done(null, false, { message: 'Invalid token' });
 
         return done(null, userResult[0]);

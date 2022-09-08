@@ -1,11 +1,11 @@
 {
   "name": "crud-template-backend-postgres",
   "version": "1.0.0",
-  "description": "DALI Lab CRUD template w/ TypeScript, Postgres",
+  "description": "DALI Lab Backend CRUD template w/ TypeScript, PostgreSQL",
   "productionURL": "https://your-api-url.here",
   "productionClientURL": "https://your-app-url.here",
   "main": "src/server.js",
-  "repository": "https://github.com/dali-lab/crud-template-backend-typescript",
+  "repository": "https://github.com/dali-lab/crud-template-backend-postgres",
   "author": "Eric Lu <Eric.J.Lu.25@dartmouth.edu>",
   "contributors": [
     "Adam McQuilkin <Adam.J.Mcquilkin.22@Dartmouth.edu>",

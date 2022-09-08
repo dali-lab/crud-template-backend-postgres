@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const db = new Sequelize( // Connect the database
-  process.env.DATABASE_URL ?? '', 
+  process.env.DATABASE_URL ?? '', // GitHub continuous integration will fail until you put a fallback URI here
   {
     dialect: 'postgres',
     logging: false,

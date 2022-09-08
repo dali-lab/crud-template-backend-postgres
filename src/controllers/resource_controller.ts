@@ -1,6 +1,5 @@
 import { RequestHandler } from 'express';
 import { ValidatedRequest } from 'express-joi-validation';
-import { getSuccessfulDeletionMessage } from '../constants';
 import { CreateResourceRequest, UpdateResourceRequest } from 'validation/resource';
 import { resourceService } from 'services';
 import { IResource } from 'db/models/resource'; 
@@ -35,6 +34,7 @@ const getResource: RequestHandler = async (req, res, next) => {
 };
 
 const updateResource: RequestHandler = async (req: ValidatedRequest<UpdateResourceRequest>, res, next) => {
+  console.log('in update');
   try {
     // ! Only allow user to update certain fields (avoids privilege elevation)
     const { title, description, value } = req.body;
@@ -57,7 +57,7 @@ const deleteResource: RequestHandler = async (req, res, next) => {
     if (resources.length === 0) throw new BaseError('Resource not found', 404);
     else {
       await resourceService.deleteResources({ id: req.params.id });
-      res.status(200).json({ message: getSuccessfulDeletionMessage(req.params.id) });
+      res.status(200).json(resources[0]); // returning the deleted resource
     }
   } catch (error) {
     next(error);

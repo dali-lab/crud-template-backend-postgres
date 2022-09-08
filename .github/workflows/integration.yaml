@@ -12,8 +12,8 @@ jobs:
         with:
           node-version: '14'
       - name: Install dependencies
-        run: yarn install
+        run: npm install
       - name: Run tests
-        run: yarn test
+        run: npm test
         env:
           AUTH_SECRET: 'pr_check'

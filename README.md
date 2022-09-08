@@ -68,7 +68,7 @@ Download the [Redux DevTools](https://chrome.google.com/webstore/detail/redux-de
 
 #### Linting
 
-ESLint is set up in this project. To keep code clean, always remember to run `npm lint` and fix any lint problems before merging into master.
+ESLint is set up in this project. To keep code clean, always remember to run `npm run lint` and fix any lint problems before merging into master.
 
 #### Unit Testing
 

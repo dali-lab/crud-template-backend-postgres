@@ -4,18 +4,20 @@ import { IUser } from 'db/models/user';
 import { IVerificationCode } from 'db/models/verification_code';
 
 export const SignUpUserSchema = joi.object<IUser>({
-  email: joi.string().email().required(),
-  password: joi.string().required(),
-  name: joi.string().required(),
+  email: joi.string().email().required().error(() => 'Signup user expecting an email'),
+  password: joi.string().required().error(() => 'Signup expecting a password'),
+  name: joi.string().required().error(() => 'Signup expecting a name'),
 });
 
-export const ResendCodeSchema = joi.object<Pick<IUser, 'email'>>({
-  email: joi.string().email().required(),
+export const ResendCodeSchema = joi.object<Pick<IUser, 'id' | 'email'>>({
+  id: joi.string().required().error(() => 'Resend code expecting an id'),
+  email: joi.string().email().required().error(() => 'Resend code user expecting an email'),
 });
 
-export const VerifyUserSchema = joi.object<Pick<IUser, 'email'> & Pick<IVerificationCode, 'code'>>({
-  email: joi.string().email().required(),
-  code: joi.string().required(),
+export const VerifyUserSchema = joi.object<Pick<IUser, 'id' | 'email'> & Pick<IVerificationCode, 'code'>>({
+  id: joi.string().required().error(() => 'Verify user expecting an id'),
+  email: joi.string().email().required().error(() => 'Verify user expecting an email'),
+  code: joi.string().required().error(() => 'Verify user expecting a code'),
 });
 
 export interface SignUpUserRequest extends ValidatedRequestSchema {

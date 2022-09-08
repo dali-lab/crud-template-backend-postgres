@@ -93,9 +93,9 @@ const resendCode: RequestHandler = async (req: ValidatedRequest<ResendCodeReques
       html: `<html><p>You must enter this code in the app before you can gain access. Your code is:</p><p>${codePayload.code}</p><p>It will expire in 5 minutes.</p></html>`,
     });
     
-    res.status(201).json({ email, code: codePayload });
-  } catch (error : any) {
-    next(error);
+    res.sendStatus(201);
+  } catch (e: any) {
+    next(e);
   }
 }; 
 

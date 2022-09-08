@@ -34,7 +34,6 @@ const getResource: RequestHandler = async (req, res, next) => {
 };
 
 const updateResource: RequestHandler = async (req: ValidatedRequest<UpdateResourceRequest>, res, next) => {
-  console.log('in update');
   try {
     // ! Only allow user to update certain fields (avoids privilege elevation)
     const { title, description, value } = req.body;

@@ -3,6 +3,7 @@ import express from 'express';
 import { createValidator } from 'express-joi-validation';
 import requireScope from 'auth/requireScope';
 import requireSelf from 'auth/requireSelf';
+import requireLogout from 'auth/requireLogout';
 import { UserScopes } from 'db/models/user'; 
 import { requireAuth, requireSignin } from 'auth';
 import { authController } from 'controllers';
@@ -39,7 +40,15 @@ router.route('/jwt-signin')
     authController.jwtSignIn,
   );
 
-router.route('/resend-code')
+router.route('/logout')
+  .post(
+    requireLogout, 
+    (req, res) => {
+      res.sendStatus(200);
+    },
+  );
+
+router.route('/resend-code/:id')
   .post(
     requireScope(UserScopes.Unverified),
     requireSelf(UserScopes.Admin),
@@ -47,7 +56,7 @@ router.route('/resend-code')
     authController.resendCode,
   );
 
-router.route('/verify')
+router.route('/verify/:id')
   .patch(
     requireScope(UserScopes.Unverified),
     requireSelf(UserScopes.Admin),

@@ -13,9 +13,11 @@ export interface CreateUserRequest extends ValidatedRequestSchema {
 }
 
 export const UpdateUserSchema = joi.object<IUser>({
+  id: joi.string(),
   email: joi.string().email(),
   password: joi.string(),
   name: joi.string(),
+  role: joi.string(),
 });
 
 export interface UpdateUserRequest extends ValidatedRequestSchema {

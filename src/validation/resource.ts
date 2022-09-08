@@ -13,6 +13,7 @@ export interface CreateResourceRequest extends ValidatedRequestSchema {
 }
 
 export const UpdateResourceSchema = joi.object<IResource>({
+  id: joi.string(),
   title: joi.string(),
   description: joi.string(),
   value: joi.number(),

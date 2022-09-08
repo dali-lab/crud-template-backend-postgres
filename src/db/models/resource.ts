@@ -36,7 +36,7 @@ class Resource extends Model<IResource> implements IResource {
 
   @AllowNull(false)
   @Column(DataTypes.FLOAT)
-    value: number;
+    value: number; // TODO: Enforce unique values
 }
 
 export default Resource;

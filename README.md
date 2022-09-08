@@ -45,7 +45,7 @@ This repository is the default backend starter pack for new DALI React projects.
   - MacOS
     - Ensure [Homebrew](https://brew.sh/) is installed
     - Run `brew install postgresql` if Postgres isn't installed
-    - If you'd like to use a GUI to interact with Postgres, download one. We recommend [Postico]
+    - If you'd like to use a GUI to interact with Postgres, download one. We recommend [Postico](https://eggerapps.at/postico/)
 3. Create a Postgres DB called `backend_template` if setting up locally, using your GUI of choice (Postico or pgAdmin).
 4. Create a `.env` file in the root directory
   - Should be in the following format:

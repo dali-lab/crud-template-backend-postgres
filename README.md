@@ -13,25 +13,25 @@ This repository is the default backend starter pack for new DALI React projects.
 
 ## Directory Structure
 
-  .
-  ├── ...         
-  ├── src                    
-  |   └── auth                # JWT middleware
-  |   └── controllers         # dispatch input; output
-  |   └── db                  # PostgreSQL database definitions
-  |     └── config            # define database modes
-  |     └── migrations        # Sequelize migrations
-  |     └── models            # defines structure of PostgreSQL tables
-  |     └── seeders           # code to populate database with initial data
-  |   └── errors              # internal error handling
-  |   └── routers             # route url endpoint
-  |     └── __tests__         # test cases for routers
-  |   └── services            # handles database queries and related functionality
-  |     └── __tests__         # test cases for services
-  |   └── validation          # validates input w/ joi
-  |   └── constants.ts        # server constants
-  |   └── server.ts           # starting point of server
-  └── ...
+    .
+    ├── ...         
+    ├── src                    
+    |   └── auth                # JWT middleware
+    |   └── controllers         # dispatch input; output
+    |   └── db                  # PostgreSQL database definitions
+    |     └── config            # define database modes
+    |     └── migrations        # Sequelize migrations
+    |     └── models            # defines structure of PostgreSQL tables
+    |     └── seeders           # code to populate database with initial data
+    |   └── errors              # internal error handling
+    |   └── routers             # route url endpoint
+    |     └── __tests__         # test cases for routers
+    |   └── services            # handles database queries and related functionality
+    |     └── __tests__         # test cases for services
+    |   └── validation          # validates input w/ joi
+    |   └── constants.ts        # server constants
+    |   └── server.ts           # starting point of server
+    └── ...
 
 ## Setup
 

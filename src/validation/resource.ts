@@ -3,9 +3,9 @@ import { ValidatedRequestSchema, ContainerTypes } from 'express-joi-validation';
 import { IResource } from '../db/models/resource';
 
 export const CreateResourceSchema = joi.object<IResource>({
-  title: joi.string().required(),
-  description: joi.string().required(),
-  value: joi.number().required(),
+  title: joi.string().required().error(() => 'Create resource expecting a title'),
+  description: joi.string().required().error(() => 'Create resource expecting a description'),
+  value: joi.number().required().error(() => 'Create resource expecting a value'),
 });
 
 export interface CreateResourceRequest extends ValidatedRequestSchema {

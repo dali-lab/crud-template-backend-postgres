@@ -47,7 +47,10 @@ This repository is the default backend starter pack for new DALI React projects.
     - Run `brew install postgresql` if PostgreSQL isn't installed
     - If you'd like to use a GUI to interact with PostgreSQL, download one. We recommend [Postico](https://eggerapps.at/postico/)
 3. Create a PostgreSQL DB called `backend_template` if setting up locally, using your GUI of choice (Postico or pgAdmin).
-4. Create a `.env` file in the root directory
+4. Set up Google Developer API (for email sending)
+   - You will need to enable [2 Step Auth](https://support.google.com/accounts/answer/185839) on your desired Google account and generate an [App Specific Password](https://myaccount.google.com/security). See this [StackExchange thread](https://stackoverflow.com/questions/19877246/nodemailer-with-gmail-and-nodejs?answertab=modifieddesc#tab-top) for more details.
+   - Alternatively just comment out all the nodemailer stuff if you don't want to use/need to set up the email service.
+5. Create a `.env` file in the root directory
   - Should be in the following format:
   - ```
     AUTH_SECRET=*secret assortment of characters used for encryption*
@@ -56,9 +59,9 @@ This repository is the default backend starter pack for new DALI React projects.
     GOOGLE_CLIENT_EMAIL=*Google Developer API email*
     GOOGLE_CLIENT_PASS=*Google Developer API password*
     ```
-5. Run `npx sequelize db:migrate` to apply migrations to DB.
-6. Run `npx sequelize db:seed:all` to load initial data.
-7. App should be ready for use now
+6. Run `npx sequelize db:migrate` to apply migrations to DB.
+7. Run `npx sequelize db:seed:all` to load initial data.
+8. App should be ready for use now
   - `npm start` to run in production mode
   - `npm run dev` to run with hot reloading
 

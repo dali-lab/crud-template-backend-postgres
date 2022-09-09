@@ -50,6 +50,7 @@ This repository is the default backend starter pack for new DALI React projects.
 4. Set up Google Developer API (for email sending)
    - You will need to enable [2 Step Auth](https://support.google.com/accounts/answer/185839) on your desired Google account and generate an [App Specific Password](https://myaccount.google.com/security). See this [StackExchange thread](https://stackoverflow.com/questions/19877246/nodemailer-with-gmail-and-nodejs?answertab=modifieddesc#tab-top) for more details.
    - Alternatively just comment out all the nodemailer stuff if you don't want to use/need to set up the email service.
+   - Note that you'll have to do a lot more email/domain configuration before the email service will adequately work in production. (Instructions for this TBD)
 5. Create a `.env` file in the root directory
   - Should be in the following format:
   - ```

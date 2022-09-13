@@ -60,7 +60,7 @@ describe('Working user router', () => {
           .set('Authorization', 'Bearer dummy_token')
           .send(user);
 
-        expect(res.status).toBe(400);
+        expect(res.status).toBe(500);
         expect(res.body.errors.length).toBe(1);
         expect(createSpy).not.toHaveBeenCalled();
       });
@@ -81,7 +81,7 @@ describe('Working user router', () => {
           .set('Authorization', 'Bearer dummy_token')
           .send(User);
 
-        expect(res.status).toBe(400);
+        expect(res.status).toBe(500);
         expect(res.body.errors.length).toBe(1);
         expect(createSpy).not.toHaveBeenCalled();
       });

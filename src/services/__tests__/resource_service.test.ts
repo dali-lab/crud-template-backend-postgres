@@ -69,7 +69,7 @@ describe('resourceService', () => {
 
     it('Gets all resources when no filter passed in', async () => {
       const resources: IResource[] = await resourceService.getResources({});
-      expect(resources.length).toBe(2);
+      expect(resources.length).toBe(8);
     });
 
     it('Gets all resources that match filter', async () => {

@@ -60,7 +60,7 @@ describe('Working resource router', () => {
           .set('Authorization', 'Bearer dummy_token')
           .send(resource);
 
-        expect(res.status).toBe(400);
+        expect(res.status).toBe(500);
         expect(res.body.errors.length).toBe(1);
         expect(createSpy).not.toHaveBeenCalled();
       });
@@ -81,7 +81,7 @@ describe('Working resource router', () => {
           .set('Authorization', 'Bearer dummy_token')
           .send(resource);
 
-        expect(res.status).toBe(400);
+        expect(res.status).toBe(500);
         expect(res.body.errors.length).toBe(1);
         expect(createSpy).not.toHaveBeenCalled();
       });
@@ -116,7 +116,7 @@ describe('Working resource router', () => {
         .set('Authorization', 'Bearer dummy_token');
 
       expect(res.status).toBe(200);
-      expect(res.body.length).toBe(1);
+      expect(res.body.length).toBe(7);
       expect(getManySpy).toHaveBeenCalled();
       getManySpy.mockClear();
     });

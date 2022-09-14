@@ -8,7 +8,6 @@ This repository is an optional backend starter pack for new DALI React projects.
   - [Sequelize](https://sequelize.org/)
   - [sequelize-typescript](https://www.npmjs.com/package/sequelize-typescript)
   - [Passport.js](https://www.passportjs.org/)
-  - [aws-sdk](https://aws.amazon.com/developer/tools/)
   - [axios](https://github.com/axios/axios)
   - [TypeScript](https://www.typescriptlang.org/docs/)
 

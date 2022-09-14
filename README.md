@@ -10,6 +10,7 @@ This repository is an optional backend starter pack for new DALI React projects.
   - [Passport.js](https://www.passportjs.org/)
   - [aws-sdk](https://aws.amazon.com/developer/tools/)
   - [axios](https://github.com/axios/axios)
+  - [TypeScript](https://www.typescriptlang.org/docs/)
 
 ## Directory Structure
 

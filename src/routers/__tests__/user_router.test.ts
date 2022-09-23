@@ -188,7 +188,7 @@ describe('Working user router', () => {
       updateSpy.mockClear();
     });
 
-    it('blocks creation when field invalid', async () => {
+    it('blocks update when field invalid', async () => {
       const updateSpy = jest.spyOn(userService, 'editUsers');
 
       const attempts = Object.keys(userDataA).concat('otherkey').map(async (key) => {

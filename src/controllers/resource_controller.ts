@@ -5,15 +5,6 @@ import { resourceService } from 'services';
 import { IResource } from 'db/models/resource'; 
 import { BaseError } from 'errors';
 
-const getAllResources: RequestHandler = async (req, res, next) => {
-  try {
-    const resources = await resourceService.getResources({});
-    res.status(200).json(resources);
-  } catch (error) {
-    next(error);
-  }
-};
-
 const createResource: RequestHandler = async (req: ValidatedRequest<CreateResourceRequest>, res, next) => {
   try {
     const savedResource = await resourceService.createResource(req.body);
@@ -23,10 +14,41 @@ const createResource: RequestHandler = async (req: ValidatedRequest<CreateResour
   }
 };
 
+const getResources: RequestHandler = async (req, res, next) => {
+  try {
+    const id = req.query?.id as string;
+    const title = req.query?.title as string;
+    const description = req.query?.description as string;
+    const value = Number(req.query?.value);
+    
+    const resources: IResource[] = await resourceService.getResources({ 
+      id,
+      title,
+      description,
+      value,
+    });
+    
+    res.status(200).json(resources);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getResource: RequestHandler = async (req, res, next) => {
   try {
-    const resources : IResource[] = await resourceService.getResources({ id: req.params.id });
+    const id = req.params.id;
+    const title = req.query?.title as string;
+    const description = req.query?.description as string;
+    const value = Number(req.query?.value);
+    
+    const resources: IResource[] = await resourceService.getResources({ 
+      id,
+      title,
+      description,
+      value,
+    });
     if (resources.length === 0) throw new BaseError('User not found', 404);
+    else if (resources.length > 1) throw new BaseError('Multiple Users found', 404);
     else res.status(200).json(resources[0]);
   } catch (error) {
     next(error);
@@ -64,7 +86,7 @@ const deleteResource: RequestHandler = async (req, res, next) => {
 };
 
 const resourceController = {
-  getAllResources,
+  getResources,
   createResource,
   getResource,
   updateResource,

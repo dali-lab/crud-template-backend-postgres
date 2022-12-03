@@ -107,22 +107,37 @@ describe('Working resource router', () => {
     });
   });
 
-  describe('GET /', () => {
-    it('returns all created resources', async () => {
-      const getManySpy = jest.spyOn(resourceService, 'getResources');
+  describe('GET /?...=...', () => {
+    it('returns empty array if no cowCensuses found', async () => {
+      const getSpy = jest.spyOn(resourceService, 'getResources');
 
       const res = await request
-        .get('/')
+        .get(`/?id=${invalidId}`)
         .set('Authorization', 'Bearer dummy_token');
 
       expect(res.status).toBe(200);
-      expect(res.body.length).toBe(7);
-      expect(getManySpy).toHaveBeenCalled();
-      getManySpy.mockClear();
+      expect(res.body).toEqual([]);
+      getSpy.mockClear();
+    });
+
+    it('returns resources by query', async () => {
+      const getSpy = jest.spyOn(resourceService, 'getResources');
+
+      const res = await request
+        .get(`/?title=${resourceDataA.title}`)
+        .set('Authorization', 'Bearer dummy_token');
+
+      expect(res.status).toBe(200);
+
+      Object.keys(resourceDataA).forEach((key) => {
+        expect(res.body[0][key]).toBe(resourceDataA[key]);
+      });
+      expect(getSpy).toHaveBeenCalled();
+      getSpy.mockClear();
     });
   });
 
-  describe('GET /:id', () => {
+  describe('GET /:id?...=...', () => {
     it('returns 404 when resource not found', async () => {
       const getSpy = jest.spyOn(resourceService, 'getResources');
 
@@ -133,10 +148,27 @@ describe('Working resource router', () => {
       getSpy.mockClear();
     });
 
-    it('returns resource if found', async () => {
+    it('returns single resource if found - generic', async () => {
       const getSpy = jest.spyOn(resourceService, 'getResources');
 
-      const res = await request.get(`/${validId}`);
+      const res = await request
+        .get(`/${validId}`)
+        .set('Authorization', 'Bearer dummy_token');
+
+      expect(res.status).toBe(200);
+      Object.keys(resourceDataA).forEach((key) => {
+        expect(res.body[key]).toBe(resourceDataA[key]);
+      });
+      expect(getSpy).toHaveBeenCalled();
+      getSpy.mockClear();
+    });
+
+    it('returns single resource if found - specific query', async () => {
+      const getSpy = jest.spyOn(resourceService, 'getResources');
+
+      const res = await request
+        .get(`/${validId}?title=${resourceDataA.title}`)
+        .set('Authorization', 'Bearer dummy_token');
 
       expect(res.status).toBe(200);
       Object.keys(resourceDataA).forEach((key) => {

@@ -20,14 +20,14 @@ if (process.env.NODE_ENV === 'test') {
 
 // find and return all resources
 router.route('/')
-  .get(
-    requireScope(UserScopes.Admin),
-    resourceController.getAllResources,
-  )
   .post(
     requireScope(UserScopes.User),
     validator.body(CreateResourceSchema),
     resourceController.createResource,
+  )
+  .get(
+    requireScope(UserScopes.Admin),
+    resourceController.getResources,
   );
 
 router.route('/:id')

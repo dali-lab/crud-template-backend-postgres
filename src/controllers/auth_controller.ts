@@ -9,6 +9,7 @@ import { RequestWithJWT } from 'auth/requests';
 import { ResendCodeRequest, SignUpUserRequest, VerifyUserRequest } from 'validation/auth';
 import { BaseError } from 'errors';
 import { sendEmail } from 'util/email';
+import { UserScopes } from 'db/models/user';
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ const signUpUser: RequestHandler = async (req: ValidatedRequest<SignUpUserReques
       email,
       password,
       name,
+      role: UserScopes.Unverified,
     });
 
     const codePayload = await verificationCodeService.createVerificationCode({ email });

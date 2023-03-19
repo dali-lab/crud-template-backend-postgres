@@ -1,11 +1,18 @@
 import joi from 'joi';
 import { ValidatedRequestSchema, ContainerTypes } from 'express-joi-validation';
 import { IResource } from '../db/models/resource';
+import { BaseError, getFieldNotFoundError } from 'errors';
 
 export const CreateResourceSchema = joi.object<IResource>({
-  title: joi.string().required().error(() => new Error('Create resource expecting a title')),
-  description: joi.string().required().error(() => new Error('Create resource expecting a description')),
-  value: joi.number().required().error(() => new Error('Create resource expecting a value')),
+  title: joi.string().required().error(() => {
+    throw new BaseError(getFieldNotFoundError('title'), 400);
+  }),
+  description: joi.string().required().error(() => {
+    throw new BaseError(getFieldNotFoundError('description'), 400);
+  }),
+  value: joi.number().required().error(() => {
+    throw new BaseError(getFieldNotFoundError('value'), 400);
+  }),
 });
 
 export interface CreateResourceRequest extends ValidatedRequestSchema {

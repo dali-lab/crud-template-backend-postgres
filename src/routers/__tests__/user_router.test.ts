@@ -60,7 +60,7 @@ describe('Working user router', () => {
           .set('Authorization', 'Bearer dummy_token')
           .send(user);
 
-        expect(res.status).toBe(500);
+        expect(res.status).toBe(400);
         expect(res.body.errors.length).toBe(1);
         expect(createSpy).not.toHaveBeenCalled();
       });
@@ -81,7 +81,7 @@ describe('Working user router', () => {
           .set('Authorization', 'Bearer dummy_token')
           .send(User);
 
-        expect(res.status).toBe(500);
+        expect(res.status).toBe(400);
         expect(res.body.errors.length).toBe(1);
         expect(createSpy).not.toHaveBeenCalled();
       });
@@ -165,7 +165,7 @@ describe('Working user router', () => {
 
   describe('PATCH /:id', () => {
     it('requires valid permissions', async () => {
-      const updateSpy = jest.spyOn(userService, 'editUsers');
+      const updateSpy = jest.spyOn(userService, 'updateUsers');
 
       const res = await request
         .patch(`/${validId}`)
@@ -176,7 +176,7 @@ describe('Working user router', () => {
     });
 
     it('returns 404 if user not found', async () => {
-      const updateSpy = jest.spyOn(userService, 'editUsers');
+      const updateSpy = jest.spyOn(userService, 'updateUsers');
 
       const res = await request
         .patch(`/${invalidId}`)
@@ -189,7 +189,7 @@ describe('Working user router', () => {
     });
 
     it('blocks update when field invalid', async () => {
-      const updateSpy = jest.spyOn(userService, 'editUsers');
+      const updateSpy = jest.spyOn(userService, 'updateUsers');
 
       const attempts = Object.keys(userDataA).concat('otherkey').map(async (key) => {
         const UserUpdate = {
@@ -211,7 +211,7 @@ describe('Working user router', () => {
     });
 
     it('updates user when body is valid', async () => {
-      const updateSpy = jest.spyOn(userService, 'editUsers');
+      const updateSpy = jest.spyOn(userService, 'updateUsers');
 
       const attempts = Object.keys(userDataB).map(async (key) => {
         const userUpdate = { [key]: userDataB[key] };

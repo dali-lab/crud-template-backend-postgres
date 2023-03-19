@@ -60,7 +60,7 @@ describe('Working resource router', () => {
           .set('Authorization', 'Bearer dummy_token')
           .send(resource);
 
-        expect(res.status).toBe(500);
+        expect(res.status).toBe(400);
         expect(res.body.errors.length).toBe(1);
         expect(createSpy).not.toHaveBeenCalled();
       });
@@ -81,7 +81,7 @@ describe('Working resource router', () => {
           .set('Authorization', 'Bearer dummy_token')
           .send(resource);
 
-        expect(res.status).toBe(500);
+        expect(res.status).toBe(400);
         expect(res.body.errors.length).toBe(1);
         expect(createSpy).not.toHaveBeenCalled();
       });
@@ -181,7 +181,7 @@ describe('Working resource router', () => {
 
   describe('PATCH /:id', () => {
     it('requires valid permissions', async () => {
-      const updateSpy = jest.spyOn(resourceService, 'editResources');
+      const updateSpy = jest.spyOn(resourceService, 'updateResources');
 
       const res = await request
         .patch(`/${validId}`)
@@ -192,7 +192,7 @@ describe('Working resource router', () => {
     });
 
     it('returns 404 if resource not found', async () => {
-      const updateSpy = jest.spyOn(resourceService, 'editResources');
+      const updateSpy = jest.spyOn(resourceService, 'updateResources');
 
       const res = await request
         .patch(`/${invalidId}`)
@@ -205,7 +205,7 @@ describe('Working resource router', () => {
     });
 
     it('blocks creation when field invalid', async () => {
-      const updateSpy = jest.spyOn(resourceService, 'editResources');
+      const updateSpy = jest.spyOn(resourceService, 'updateResources');
 
       const attempts = Object.keys(resourceDataA).concat('otherkey').map(async (key) => {
         const resourceUpdate = {
@@ -227,7 +227,7 @@ describe('Working resource router', () => {
     });
 
     it('updates resource when body is valid', async () => {
-      const updateSpy = jest.spyOn(resourceService, 'editResources');
+      const updateSpy = jest.spyOn(resourceService, 'updateResources');
 
       const attempts = Object.keys(resourceDataB).map(async (key) => {
         const resourceUpdate = { [key]: resourceDataB[key] };

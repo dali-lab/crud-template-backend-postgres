@@ -69,7 +69,7 @@ describe('resourceService', () => {
 
     it('Gets all resources when no filter passed in', async () => {
       const resources: IResource[] = await resourceService.getResources({});
-      expect(resources.length).toBe(8);
+      expect(resources.length).toBe(6);
     });
 
     it('Gets all resources that match filter', async () => {
@@ -78,16 +78,16 @@ describe('resourceService', () => {
     });
   });
 
-  describe('editResources', () => {
+  describe('updateResources', () => {
     it('Updates resource field, returns updated resource', async () => {
       const newDescription = 'Test description';
 
-      const updatedResource: IResource = await resourceService.editResources({ description: newDescription }, { id: idResourceA }).then((res) => res[0]);
+      const updatedResource: IResource = await resourceService.updateResources({ description: newDescription }, { id: idResourceA }).then((res) => res[0]);
       expect(updatedResource.description).toBe(newDescription);
     });
 
     it('Returns empty array if no resources to edit', async () => {
-      expect(await resourceService.editResources({ id: invalidId }, { value: 10000 })).toStrictEqual([]);
+      expect(await resourceService.updateResources({ id: invalidId }, { value: 10000 })).toStrictEqual([]);
     });
   });
 

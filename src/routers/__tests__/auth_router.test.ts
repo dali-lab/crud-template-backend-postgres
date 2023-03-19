@@ -62,7 +62,7 @@ describe('Working auth router', () => {
           .post('/signup')
           .send(user);
 
-        expect(res.status).toBe(500);
+        expect(res.status).toBe(400);
         expect(res.body.errors.length).toBe(1);
         expect(createSpy).not.toHaveBeenCalled();
       });
@@ -83,7 +83,7 @@ describe('Working auth router', () => {
           .post('/signup')
           .send(User);
 
-        expect(res.status).toBe(500);
+        expect(res.status).toBe(400);
         expect(res.body.errors.length).toBe(1);
         expect(createSpy).not.toHaveBeenCalled();
       });

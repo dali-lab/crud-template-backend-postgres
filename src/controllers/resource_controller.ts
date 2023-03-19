@@ -60,7 +60,7 @@ const updateResource: RequestHandler = async (req: ValidatedRequest<UpdateResour
     // ! Only allow user to update certain fields (avoids privilege elevation)
     const { title, description, value } = req.body;
     
-    const updatedResources = await resourceService.editResources(
+    const updatedResources = await resourceService.updateResources(
       { title, description, value },
       { id: req.params.id },
     );

@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { RequestHandler } from 'express';
 import { ValidatedRequest } from 'express-joi-validation';
-import { getSuccessfulDeletionMessage } from '../constants';
+import { getSuccessfulDeletionMessage } from '../util/constants';
 import { userService } from 'services';
 import { CreateUserRequest, UpdateUserRequest } from 'validation/users';
 import { IUser } from 'db/models/user'; 
 import { BaseError } from 'errors';
+import { UserScopes } from 'db/models/user';
 
 const createNewUser: RequestHandler = async (req: ValidatedRequest<CreateUserRequest>, res, next) => {
   try {
@@ -15,7 +16,12 @@ const createNewUser: RequestHandler = async (req: ValidatedRequest<CreateUserReq
       name,
     } = req.body;
 
-    const newUser = await userService.createUser({ email, password, name });
+    const newUser = await userService.createUser({ 
+      email, 
+      password, 
+      name, 
+      role: UserScopes.Unverified,
+    });
 
     res.status(201).json(newUser);
   } catch (error) {
@@ -38,7 +44,7 @@ const updateUser: RequestHandler = async (req: ValidatedRequest<UpdateUserReques
     // ! Only allow user to update certain fields (avoids privilege elevation)
     const { email, password, name } = req.body;
 
-    const updatedUsers = await userService.editUsers(
+    const updatedUsers = await userService.updateUsers(
       { email, password, name },
       { id: req.params.id },
     );

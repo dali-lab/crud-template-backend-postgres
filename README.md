@@ -2,7 +2,15 @@
 
 This repository is an optional backend starter pack for new DALI React projects. Installation and setup instructions are included below. You should eventually customize this README file with project-specific documentation.
 
-## Tech Stack
+## Designs
+[Screenshot description]
+
+[Link to the project Figma]()
+
+[2-4 screenshots from the app]
+
+## Architecture
+### Tech Stack
   - [Express](https://expressjs.com/)
   - [PostgreSQL](https://www.postgresql.org/)
   - [Sequelize](https://sequelize.org/)
@@ -11,7 +19,20 @@ This repository is an optional backend starter pack for new DALI React projects.
   - [axios](https://github.com/axios/axios)
   - [TypeScript](https://www.typescriptlang.org/docs/)
 
-## Directory Structure
+#### External Packages
+- [Description of any notable added services]
+
+### Style
+[Describe notable code style conventions]
+
+We are using [typically a configuration like [CS52's React-Native ESLint Configuration](https://gist.github.com/timofei7/c8df5cc69f44127afb48f5d1dffb6c84) or [CS52's ES6 and Node ESLint Configuration](https://gist.github.com/timofei7/21ac43d41e506429495c7368f0b40cc7)]
+
+### Data Models
+[Brief description of typical data models.]
+
+[Detailed description should be moved to the repo's Wiki page]
+
+### Directory Structure
 
     .
     ├── ...         
@@ -34,9 +55,11 @@ This repository is an optional backend starter pack for new DALI React projects.
     |   └── server.ts           # starting point of server
     └── ...
 
+For more detailed documentation on our file structure and specific functions in the code, feel free to check the project files themselves.
+
 ## Setup
 
-1. clone repo and `npm install`
+1. Clone repo and `npm install`
 2. Install PostgreSQL + management tool
   - Make sure to do `npm install --save-dev sequelize-cli` if you don't have the sequelize cli yet.
   - Windows
@@ -70,10 +93,6 @@ This repository is an optional backend starter pack for new DALI React projects.
   - `npm start` to run in production mode
   - `npm run dev` to run with hot reloading
 
-#### Redux Debugging
-
-Download the [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en) extension.
-
 #### Linting
 
 ESLint is set up in this project. To keep code clean, always remember to run `npm run lint` and fix any lint problems before merging into master.
@@ -83,7 +102,23 @@ ESLint is set up in this project. To keep code clean, always remember to run `np
 Jest unit testing is set up for the controllers, routers, and services. Remember to run `npm test` and fix any breaking changes that might've occured. 
   - You can also run just an individual test file with `npm test -- *filename*`
 
-## Authors & Credits
+## Deployment
+[Where is the app deployed? i.e. Expo, Surge, TestFlight etc.]
+
+[What are the steps to re-deploy the project with any new changes?]
+
+[How does one get access to the deployed project?]
+
+## Authors
+* Firstname Lastname 'YY, role
+
+## Acknowledgments
+We would like to thank [anyone you would like to acknowledge] for [what you would like to acknowledge them for].
+
+---
+Designed and developed by [@DALI Lab](https://github.com/dali-lab)
+
+### Template
 - Eric Lu '25
 
 Additional credit goes to Adam McQuilkin '22, Ziray Hao '22, Jack Keane '22, Thomas Monfre '21 for developing the original DALI [CRUD Template Backend](https://github.com/dali-lab/crud-template-backend), which this starter pack was evolved from.

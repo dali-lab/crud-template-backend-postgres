@@ -40,9 +40,11 @@ describe('userService', () => {
     it('Can create user A', async () => {
       const user: IUser = await userService.createUser(userDataA);
 
-      expect(user.id).toBeDefined();
-      expect(user.email).toBe(userDataA.email);
-      expect(user.name).toBe(userDataA.name);
+      Object.keys(userDataA)
+        .filter((key) => !['password'].includes(key))
+        .map((key) => {
+          expect(user[key]).toEqual(userDataA[key]);
+        });
 
       const passCompareResult = await new Promise<boolean>((resolve, reject) => {
         bcrypt.compare(userDataA.password, user.password, (err, result) => {
@@ -61,11 +63,12 @@ describe('userService', () => {
 
     it('Can create user B', async () => {
       const user: IUser = await userService.createUser(userDataB);
-
-      expect(user.id).toBeDefined();
-      expect(user.email).toBe(userDataB.email);
-      expect(user.name).toBe(userDataB.name);
-
+      
+      Object.keys(userDataB)
+        .filter((key) => !['password'].includes(key))
+        .map((key) => {
+          expect(user[key]).toEqual(userDataB[key]);
+        });
       const passCompareResult = await new Promise<boolean>((resolve, reject) => {
         bcrypt.compare(userDataB.password, user.password, (err, result) => {
           if (err) reject(err);
@@ -92,11 +95,11 @@ describe('userService', () => {
     });
   });
 
-  describe('editUsers', () => {
+  describe('updateUsers', () => {
     it('Updates user field', async () => {
       const newName = 'Jerry Jerry';
 
-      const updatedUser1: IUser = await userService.editUsers({ name: newName }, { id: idUserA }).then((res) => res[0]);
+      const updatedUser1: IUser = await userService.updateUsers({ name: newName }, { id: idUserA }).then((res) => res[0]);
       expect(updatedUser1.name).toBe(newName);
 
       const updatedUser2: IUser = await userService.getUsers({ id: idUserA }).then((res) => res[0]);
@@ -104,7 +107,7 @@ describe('userService', () => {
     });
 
     it('Returns empty array if no users to edit', async () => {
-      expect(await userService.editUsers({ id: invalidId }, { name: 'Larry' })).toStrictEqual([]);
+      expect(await userService.updateUsers({ id: invalidId }, { name: 'Larry' })).toStrictEqual([]);
     });
   });
 
@@ -113,6 +116,7 @@ describe('userService', () => {
       await userService.deleteUsers({ id: idUserA });
       expect(await userService.getUsers({ id: idUserA })).toStrictEqual([]);
     });
+    
     it('Deletes existing user B', async () => {
       await userService.deleteUsers({ id: idUserB });
       expect(await userService.getUsers({ id: idUserB })).toStrictEqual([]);

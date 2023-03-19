@@ -2,7 +2,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import ResourceModel, { IResource } from 'db/models/resource';
 import { Op } from 'sequelize';
-import { DatabaseQuery } from '../constants';
+import { DatabaseQuery } from '../util/constants';
 import { BaseError } from 'errors';
 
 export interface ResourceParams {
@@ -49,7 +49,7 @@ const getResources = async (params: ResourceParams) => {
   }
 };
 
-const editResources = async (resource: Partial<IResource>, params: ResourceParams) => {
+const updateResources = async (resource: Partial<IResource>, params: ResourceParams) => {
   const query = constructQuery(params);
   return (await ResourceModel.update(resource, { ...query, returning: true }))[1];
 };
@@ -76,7 +76,7 @@ const createResource = async (resource: Pick<IResource, 'title' | 'description' 
 
 const resourceService = {
   getResources,
-  editResources,
+  updateResources,
   deleteResources,
   createResource,
 };

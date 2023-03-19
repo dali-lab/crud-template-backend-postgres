@@ -1,9 +1,9 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { v4 as uuidv4 } from 'uuid';
-import UserModel, { IUser, UserScopes } from 'db/models/user';
+import UserModel, { IUser } from 'db/models/user';
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
-import { DatabaseQuery } from '../constants';
+import { DatabaseQuery } from '../util/constants';
 import { BaseError } from 'errors';
 
 export interface UserParams {
@@ -68,7 +68,7 @@ const getUsers = async (params: Omit<UserParams, 'password'>) => {
   }
 };
 
-const editUsers = async (user: Partial<IUser>, params: UserParams) => {
+const updateUsers = async (user: Partial<IUser>, params: UserParams) => {
   if (params.password) {
     params.password = await bcrypt.hash(params.password, 10);
   }
@@ -103,7 +103,7 @@ const isValidPassword = async (email: string, password: string) => {
   }
 };
 
-const createUser = async (user: Pick<IUser, 'email' | 'password' | 'name'>) => {
+const createUser = async (user: Omit<IUser, 'id'>) => {
   // check for inactive account with this email
   // db-level unique constraint on email; can assume only one user if any
   const usersSameEmail = await getUsers({
@@ -111,12 +111,10 @@ const createUser = async (user: Pick<IUser, 'email' | 'password' | 'name'>) => {
   });
 
   if (usersSameEmail.length == 0) {
-    // TODO: change verified back to false once email verification is fixed
     try {
       return await UserModel.create({ 
         ...user, 
         id: uuidv4(),
-        role: UserScopes.Unverified,
       });
     } catch (e : any) {
       throw new BaseError(e.message, 500);
@@ -129,7 +127,7 @@ const createUser = async (user: Pick<IUser, 'email' | 'password' | 'name'>) => {
 const userService = {
   createUser,
   getUsers,
-  editUsers,
+  updateUsers,
   deleteUsers,
   isValidPassword,
 };

@@ -3,18 +3,7 @@ import VerificationCodeModel, { IVerificationCode } from 'db/models/verification
 import { BaseError } from 'errors';
 import { userService } from 'services';
 import { IUser, UserScopes } from 'db/models/user';
-
-const generateCode = () => {
-  const length = 6;
-  const a = 'A'.charCodeAt(0);
-  const z = 'Z'.charCodeAt(0);
-
-  let code = '';
-  for (let i = 0; i < length; i++)
-    code += String.fromCharCode(Math.floor(Math.random() * (z - a + 1)) + a);
-
-  return code;
-};
+import { generateCode } from 'util/code';
 
 const getVerificationCode = async (
   params: Pick<IVerificationCode, 'email'>,
@@ -49,7 +38,7 @@ const createVerificationCode = async (
   try {
     return await VerificationCodeModel.create({
       ...params,
-      code: generateCode(),
+      code: generateCode(6),
       expiration: new Date(new Date().getTime() + 5 * 60 * 1000), // 5 minutes from now
     });
   } catch (e: any) {
@@ -74,7 +63,7 @@ const verifyVerificationCode = async (
       throw new BaseError('Verification code expired.', 401);
     }
 
-    const verifiedUser: IUser[] = await userService.editUsers(
+    const verifiedUser: IUser[] = await userService.updateUsers(
       { role: UserScopes.User },
       { email: params.email },
     );

@@ -20,7 +20,9 @@ This repository is an optional backend starter pack for new DALI React projects.
   - [TypeScript](https://www.typescriptlang.org/docs/)
 
 #### External Packages
-- [Description of any notable added services]
+- [aws-sdk](https://yarnpkg.com/package/aws-sdk)
+- [@sendgrid/mail](https://docs.sendgrid.com/for-developers/sending-email/quickstart-nodejs)
+- [Add any other notable external packages here]
 
 ### Style
 [Describe notable code style conventions]
@@ -73,8 +75,10 @@ For more detailed documentation on our file structure and specific functions in 
     - If you'd like to use a GUI to interact with PostgreSQL, download one. We recommend [Postico](https://eggerapps.at/postico/)
 3. Create a PostgreSQL DB called `backend_template` if setting up locally, using your GUI of choice (Postico or pgAdmin).
 4. Set up Sendgrid API (for email sending)
-   - (Instructions for this TBD)
-5. Create a `.env` file in the root directory
+   - Information about SendGrid API keys: https://docs.sendgrid.com/ui/account-and-settings/api-keys
+5. Set up Amazon AWS s3 bucket (for photo storage)
+   - https://cs52.me/assignments/sa/s3-upload/
+6. Create a `.env` file in the root directory
   - Should be in the following format:
   - ```
     AUTH_SECRET=*secret assortment of characters used for encryption*
@@ -87,9 +91,9 @@ For more detailed documentation on our file structure and specific functions in 
     SENDGRID_API_KEY=
     DEBUG=true
     ```
-6. Run `npx sequelize db:migrate` to apply migrations to DB.
-7. Run `npx sequelize db:seed:all` to load initial data.
-8. App should be ready for use now
+7. Run `npx sequelize db:migrate` to apply migrations to DB.
+8. Run `npx sequelize db:seed:all` to load initial data.
+9. App should be ready for use now
   - `npm start` to run in production mode
   - `npm run dev` to run with hot reloading
 
